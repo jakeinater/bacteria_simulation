@@ -1,24 +1,18 @@
 ;; jake.zhao@mail.mcgill.ca
 ;; this is a quick prototype
 ;; 30 ticks = 1 second
-;; approximations: 2D, one species, all identical (same D, same size etc), eta ~= eta_water = 1e-3, tumbling ellipsoid (reality mixture of lengthwise and random?), T = 300K, kb =
+;; approximations: 2D, one species, all identical (same D, same size etc), eta ~= eta_water = 10e-3, tumbling ellipsoid (reality mixture of lengthwise and random?), T = 300K, kb =
 ;; 3 sub regimes:
 ;; (stuck to top, bottom, middle),
 ;; D = .308um^2/2, dx = 0.14um, no interactions between agents
 ;; netlogo restrictions: can make angled walls
-;; need: more accurate estimate of k_tumble, spinning behaviour
 ;;
-;; how to calculate tangent here? might have to use another platform :) need vectors :(
-;; how do we know if all the effects add 'linearly', ie near wall hydrodynamics, attractive, diffusion, electrostatic/intermolecular,
-;; figure out how to implement the harvard paper
-
 
 globals [
-  D ;; um/tick
-  dl ;;um, note this does NOT take into account flagella, likely much smaller, HOW can we determine this???
+  D
+  dl
   heatmap-max
   tmp3
-  dtheta ;;degree, note this does NOT take into account flagella, likely much smaller, HOW can we determine this??? currently using papers approximation
 ]
 
 breed [ecolis ecoli]
@@ -41,7 +35,7 @@ patches-own [
 to setup
   clear-all
 
-  import-pcolors "plaza.png"
+  import-pcolors "uni-maze.png"
   random-seed 100
   setup-turtles
   setup-walls
@@ -50,7 +44,6 @@ to setup
   set D 1
   set dl 0.14
   set heatmap-max 2
-  set dtheta 1.466 ;;10.265
 
   reset-ticks
 end
@@ -73,7 +66,7 @@ end
 
 to setup-walls
   ask patches [
-    ifelse (pcolor <= 5) [
+    ifelse not ((pcolor mod 10) >= 6 and (pcolor mod 10) < 10) [
       set wall? true
       set pcolor 0
     ] [
@@ -130,15 +123,6 @@ to diffuse-turtles
       setxy (xcor - dl) ycor
     ]
   ]
-
-  ask turtles [
-    set tmp (random 2)
-    ifelse tmp = 0 [
-      set heading (heading + dtheta)
-    ][
-     set heading (heading - dtheta)
-    ]
-  ]
 end
 
 to forward-turtles
@@ -147,12 +131,13 @@ to forward-turtles
   ]
 end
 
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-743
-544
+742
+543
 -1
 -1
 5.0
@@ -196,12 +181,12 @@ SLIDER
 759
 14
 932
-47
+48
 num-bacteria
 num-bacteria
 1
 100
-1.0
+100.0
 1
 1
 NIL
@@ -211,7 +196,7 @@ CHOOSER
 760
 60
 899
-105
+106
 agent
 agent
 "E.coli"
@@ -260,10 +245,10 @@ SWITCH
 762
 181
 911
-214
+215
 uniform-head?
 uniform-head?
-0
+1
 1
 -1000
 
@@ -282,7 +267,7 @@ SWITCH
 762
 221
 884
-254
+255
 trace-path?
 trace-path?
 0
@@ -293,7 +278,7 @@ SWITCH
 762
 262
 879
-295
+296
 heat-map?
 heat-map?
 0

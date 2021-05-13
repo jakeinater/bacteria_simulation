@@ -35,7 +35,7 @@ patches-own [
 to setup
   clear-all
 
-  import-pcolors "plaza.png"
+  import-pcolors "uni-maze.png"
   random-seed 100
   setup-turtles
   setup-walls
@@ -66,7 +66,7 @@ end
 
 to setup-walls
   ask patches [
-    ifelse (pcolor <= 5) [
+    ifelse not ((pcolor mod 10) >= 6 and (pcolor mod 10) < 10) [
       set wall? true
       set pcolor 0
     ] [
@@ -136,24 +136,24 @@ end
 GRAPHICS-WINDOW
 210
 10
-744
-545
+620
+420
 -1
 -1
-5.0
+2.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
--52
-52
--52
-52
+1
+1
+-100
+100
+-100
+100
 1
 1
 1
@@ -281,7 +281,7 @@ SWITCH
 296
 heat-map?
 heat-map?
-1
+0
 1
 -1000
 
