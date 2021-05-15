@@ -12,13 +12,12 @@ globals [
   D
   dl
   heatmap-max
-  tmp3
+  walls
 ]
 
 breed [ecolis ecoli]
 
 turtles-own [
-  tmp ;; tmp storage var
   tumble?
   roof-regime?
   floor-regime?
@@ -29,7 +28,7 @@ turtles-own [
 patches-own [
   wall?
   heat
-  tmp2
+  angle
 ]
 
 to setup
@@ -44,6 +43,8 @@ to setup
   set D 1
   set dl 0.14
   set heatmap-max 2
+
+  sabel
 
   reset-ticks
 end
@@ -64,26 +65,34 @@ to go
   tick
 end
 
-to setup-walls
+to setup-walls ;; set all the paths to white, other black, then set all the black parts that are not bordering a white part to grey and set wall? false
   ask patches [
     ifelse not ((pcolor mod 10) >= 6 and (pcolor mod 10) < 10) [
-      set wall? true
       set pcolor 0
+      set wall? true
     ] [
-      set wall? false
       set pcolor 9.9
+      set wall? false
     ]
 
   ]
+  ask patches [
+    if (all? neighbors [not (pcolor = 9.9)]) and pcolor = 0 [
+      set pcolor 2
+      set wall? false
+    ]
+  ]
+
+  set walls (patches with [wall? = true])
 end
 
 to update-heatmap
   ask turtles [
     set heat (heat + 1)
   ]
-  set tmp3 (max [heat] of turtles)
-  if tmp3 >= heatmap-max [
-    set heatmap-max tmp3
+  let tmp (max [heat] of turtles)
+  if tmp >= heatmap-max [
+    set heatmap-max tmp
   ]
   ask patches [
     if not wall? [
@@ -109,7 +118,7 @@ end
 to diffuse-turtles
   ask turtles [
 
-    set tmp (random 4)
+    let tmp (random 4)
     if tmp = 0 [
       setxy xcor (ycor + dl)
     ]
@@ -131,24 +140,38 @@ to forward-turtles
   ]
 end
 
-
+to sabel
+  ask walls [
+    ;;([pcolor] of (patch-at -1 1))
+    let s1 (pcolor * -1) + ([pcolor] of (patch-at 2 0)) +
+    (-2) * ([pcolor] of (patch-at 0 -1)) + (2) * ([pcolor] of (patch-at 2 -1)) +
+    (-1) * ([pcolor] of (patch-at 0 -2)) + ([pcolor] of (patch-at 2 -2))
+    let s2 (-1) * pcolor + (-2) * ([pcolor] of (patch-at 1 0)) + (-1) * ([pcolor] of (patch-at 2 0)) +
+    ([pcolor] of (patch-at 0 -2)) + (2) * ([pcolor] of (patch-at 1 -2)) + ([pcolor] of (patch-at 2 -2))
+    set angle (atan s2 s1)
+    if ((pxcor mod 2) = 0) and (pycor mod 2 = 0) [
+      set plabel angle
+      set plabel-color red
+    ]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+151
 10
-620
-420
+1164
+1024
 -1
 -1
-2.0
+5.0
 1
 10
 1
 1
 1
 0
-1
-1
+0
+0
 1
 -100
 100
@@ -178,10 +201,10 @@ NIL
 1
 
 SLIDER
-759
-14
-932
-48
+1611
+25
+1854
+72
 num-bacteria
 num-bacteria
 1
@@ -193,20 +216,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-760
-60
-899
-106
+1612
+89
+1807
+152
 agent
 agent
 "E.coli"
 0
 
 INPUTBOX
-760
-113
-811
-173
+1612
+163
+1684
+247
 start-x
 0.0
 1
@@ -214,10 +237,10 @@ start-x
 Number
 
 INPUTBOX
-814
-113
-865
-173
+1688
+163
+1760
+247
 start-y
 0.0
 1
@@ -242,10 +265,10 @@ NIL
 0
 
 SWITCH
-762
-181
-911
-215
+1614
+258
+1823
+305
 uniform-head?
 uniform-head?
 1
@@ -253,10 +276,10 @@ uniform-head?
 -1000
 
 INPUTBOX
-867
-113
-918
-173
+1761
+163
+1833
+247
 init-head
 200.0
 1
@@ -264,10 +287,10 @@ init-head
 Number
 
 SWITCH
-762
-221
-884
-255
+1614
+314
+1785
+361
 trace-path?
 trace-path?
 0
@@ -275,21 +298,21 @@ trace-path?
 -1000
 
 SWITCH
-762
-262
-879
-296
+1614
+371
+1778
+418
 heat-map?
 heat-map?
-0
+1
 1
 -1000
 
 INPUTBOX
-885
-263
-983
-323
+1787
+373
+1925
+457
 heatmap-seconds
 1000.0
 1
@@ -297,10 +320,10 @@ heatmap-seconds
 Number
 
 INPUTBOX
-920
-113
-971
-173
+1836
+163
+1908
+247
 velocity
 0.0
 1
