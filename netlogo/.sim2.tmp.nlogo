@@ -13,9 +13,11 @@ globals [
   dl
   heatmap-max
   walls
+  df
+  dtheta ;;degree, note this does NOT take into account flagella, likely much smaller, HOW can we determine this??? currently using papers approximation
+
 ]
 
-breed [ecolis ecoli]
 
 turtles-own [
   tumble?
@@ -42,9 +44,11 @@ to setup
   ;;init constants
   set D 1
   set dl 0.14
-  set heatmap-max 2
+  set heatmap-max 1
+  set df (2 / 3)
+  set dtheta 1.466 ;;10.265
 
-  sabel
+  sobel
 
   reset-ticks
 end
@@ -54,11 +58,12 @@ to go
     if ticks >= heatmap-seconds * 30 [
       clear-turtles
       setup-turtles
+      calc-heatmap
       reset-ticks
     ]
     update-heatmap
   ]
-  diffuse-turtles
+  ;;diffuse-turtles
   forward-turtles
 
 
@@ -90,12 +95,16 @@ to update-heatmap
   ask turtles [
     set heat (heat + 1)
   ]
+
+end
+
+to calc-heatmap
   let tmp (max [heat] of turtles)
   if tmp >= heatmap-max [
     set heatmap-max tmp
   ]
   ask patches [
-    if not wall? [
+    if not wall? and (not (pcolor = 2)) [
       set pcolor ( 19.9 - (heat / heatmap-max) * 4)
     ]
   ]
@@ -132,35 +141,81 @@ to diffuse-turtles
       setxy (xcor - dl) ycor
     ]
   ]
+
+  ask turtles [
+    let tmp (random 2)
+    ifelse tmp = 0 [
+      set heading (heading + dtheta)
+    ][
+      set heading (heading - dtheta)
+    ]
+  ]
+
 end
 
 to forward-turtles
   ask turtles [
-    forward 2 / 3
-  ]
-end
+    let here patch-here
+    let proximal-patches ((walls in-cone (df + .708) (180 - 2 * dtheta)) with [not (self = here)])
+    let walls-infront (min-one-of proximal-patches [distance myself])
+    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
+    ;;print walls-infront
+    ifelse walls-infront = nobody [
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
+      let incident-x (sin (heading))
+      let incident-y (cos (heading))
+      let norm-x (sin a)
+      let norm-y (cos a)
+      let scale (incident-x * norm-x + incident-y * norm-y)
+      let rx (incident-x - 2 * scale * norm-x)
+      let ry (incident-y - 2 * scale * norm-y)
+      let gamma (atan rx ry)
 
-to sabel
-  ask walls [
-    ;;([pcolor] of (patch-at -1 1))
-    let s1 (pcolor * -1) + ([pcolor] of (patch-at 2 0)) +
-    (-2) * ([pcolor] of (patch-at 0 -1)) + (2) * ([pcolor] of (patch-at 2 -1)) +
-    (-1) * ([pcolor] of (patch-at 0 -2)) + ([pcolor] of (patch-at 2 -2))
-    let s2 (-1) * pcolor + (-2) * ([pcolor] of (patch-at 1 0)) + (-1) * ([pcolor] of (patch-at 2 0)) +
-    ([pcolor] of (patch-at 0 -2)) + (2) * ([pcolor] of (patch-at 1 -2)) + ([pcolor] of (patch-at 2 -2))
-    set angle (atan s2 s1)
-    if ((pxcor mod 5) = 0) and (pycor mod  = 0) [
-      set plabel angle
-      set plabel-color red
+
+      ;;let d1 ((distance walls-infront) - .71)
+      ;;print d1
+      ;forward d1
+      set heading gamma
+      forward (df - d1)
+
     ]
   ]
 end
+
+to sobel
+  ask walls [
+    ;;([pcolor] of (patch-at dx dy))
+    ;;let s1 (pcolor * -1) + ([pcolor] of (patch-at 2 0)) +
+    ;;(-2) * ([pcolor] of (patch-at 0 -1)) + (2) * ([pcolor] of (patch-at 2 -1)) +
+    ;;(-1) * ([pcolor] of (patch-at 0 -2)) + ([pcolor] of (patch-at 2 -2))
+    ;;let s2 (-1) * pcolor + (-2) * ([pcolor] of (patch-at 1 0)) + (-1) * ([pcolor] of (patch-at 2 0)) +
+    ;;([pcolor] of (patch-at 0 -2)) + (2) * ([pcolor] of (patch-at 1 -2)) + ([pcolor] of (patch-at 2 -2))
+    ;;set angle (atan s2 s1)
+    let s1 (-1) * ([pcolor] of (patch-at -1 1)) + ([pcolor] of (patch-at 1 1)) +
+    (-2) * ([pcolor] of (patch-at -1 0)) + (2) * ([pcolor] of (patch-at 1 0)) +
+    (-1) * ([pcolor] of (patch-at -1 -1)) + ([pcolor] of (patch-at 1 -1))
+    let s2 (-1) * ([pcolor] of (patch-at -1 1)) + (-2) * ([pcolor] of (patch-at 0 1)) + (-1) * ([pcolor] of (patch-at 1 1)) +
+    ([pcolor] of (patch-at -1 -1)) + (2) * ([pcolor] of (patch-at 0 -1)) + ([pcolor] of (patch-at 1 -1))
+    set angle (((atan s2 s1) + 90) mod 360) ;;adjust for weird angle axis
+    ;;show labels
+    ;;ifelse ((pxcor mod 2) = 0) and (pycor mod 2 = 0) [
+      ;;set plabel angle
+     ;; set plabel-color red
+   ;; ][
+     ;; set plabel angle
+     ;; set plabel-color blue
+    ;;]
+  ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 151
 10
-1164
-1024
+2164
+2024
 -1
 -1
 5.0
@@ -170,13 +225,13 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
-0
 1
--100
-100
--100
-100
+1
+1
+-200
+200
+-200
+200
 1
 1
 1
@@ -201,35 +256,35 @@ NIL
 1
 
 SLIDER
-1611
-25
-1854
-72
+1240
+22
+1483
+55
 num-bacteria
 num-bacteria
 1
 100
-100.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-1612
-89
-1807
-152
+1241
+86
+1436
+131
 agent
 agent
 "E.coli"
 0
 
 INPUTBOX
-1612
-163
-1684
-247
+1241
+160
+1313
+244
 start-x
 0.0
 1
@@ -237,12 +292,12 @@ start-x
 Number
 
 INPUTBOX
-1688
-163
-1760
-247
+1317
+160
+1389
+244
 start-y
-0.0
+-95.0
 1
 0
 Number
@@ -265,32 +320,32 @@ NIL
 0
 
 SWITCH
-1614
-258
-1823
-305
+1243
+255
+1452
+288
 uniform-head?
 uniform-head?
-1
+0
 1
 -1000
 
 INPUTBOX
-1761
-163
-1833
-247
+1390
+160
+1462
+244
 init-head
-200.0
+0.0
 1
 0
 Number
 
 SWITCH
-1614
-314
-1785
-361
+1243
+311
+1414
+344
 trace-path?
 trace-path?
 0
@@ -298,32 +353,32 @@ trace-path?
 -1000
 
 SWITCH
-1614
-371
-1778
-418
+1243
+368
+1407
+401
 heat-map?
 heat-map?
-0
+1
 1
 -1000
 
 INPUTBOX
-1787
-373
-1925
-457
+1416
+370
+1554
+454
 heatmap-seconds
-1000.0
+100.0
 1
 0
 Number
 
 INPUTBOX
-1836
-163
-1908
-247
+1465
+160
+1537
+244
 velocity
 0.0
 1
