@@ -9,12 +9,12 @@
 ;;
 
 globals [
-  D
   dl
   heatmap-max
   walls
   df
   dtheta ;;degree, note this does NOT take into account flagella, likely much smaller, HOW can we determine this??? currently using papers approximation
+  scale-pixels
 
 ]
 
@@ -40,13 +40,13 @@ to setup
   random-seed 100
   setup-turtles
   setup-walls
+  find-scale
 
   ;;init constants
-  set D 1
-  set dl 0.14
+  set dl (diff-step * scale-pixels);;0.14
   set heatmap-max 1
-  set df (2 / 3)
-  set dtheta 1.466 ;;10.265
+  set df convert-velocity ;;(2 / 3)
+  set dtheta diff-rot ;;1.466 ;;10.265
 
   sobel
 
@@ -117,9 +117,10 @@ end
 to setup-turtles
   create-turtles num-bacteria [
     setxy start-x start-y
-    set size 1.5
+    set size turtle-size
     if trace-path? and not heat-map? [
       pen-down
+      ;;set pen-size 2;;trace-thickness
     ]
     if uniform-head? [
       set heading init-head
@@ -228,13 +229,22 @@ to kill-outside
   ]
 end
 
+to find-scale
+  let x (abs (patch2-x - patch1-x))
+  let y (abs (patch2-y - patch1-y))
+  let pixel-length (sqrt (x ^ 2 + y ^ 2))
+  set scale-pixels (pixel-length / known-distance)
+end
 
+to-report convert-velocity
+  report (velocity * scale-pixels / 30)
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-151
-10
-1164
-1024
+1098
+53
+3111
+2067
 -1
 -1
 5.0
@@ -247,10 +257,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--100
-100
--100
-100
+-200
+200
+-200
+200
 1
 1
 1
@@ -275,35 +285,35 @@ NIL
 1
 
 SLIDER
-1240
-22
-1483
-55
+177
+20
+420
+53
 num-bacteria
 num-bacteria
 1
 100
-100.0
+17.0
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-1244
-126
-1439
-171
+182
+124
+377
+169
 agent
 agent
 "E.coli"
 0
 
 INPUTBOX
-1244
-180
-1316
-264
+182
+177
+254
+261
 start-x
 1.0
 1
@@ -311,12 +321,12 @@ start-x
 Number
 
 INPUTBOX
-1320
-180
-1392
-264
+257
+177
+329
+261
 start-y
--96.0
+-90.0
 1
 0
 Number
@@ -339,21 +349,21 @@ NIL
 0
 
 SWITCH
-1246
-276
-1455
-309
+184
+274
+393
+307
 uniform-head?
 uniform-head?
-0
+1
 1
 -1000
 
 INPUTBOX
-1393
-180
-1465
-264
+330
+177
+402
+261
 init-head
 0.0
 1
@@ -361,10 +371,10 @@ init-head
 Number
 
 SWITCH
-1246
-332
-1417
-365
+185
+322
+356
+355
 trace-path?
 trace-path?
 0
@@ -372,10 +382,10 @@ trace-path?
 -1000
 
 SWITCH
-1246
-389
-1410
-422
+185
+367
+349
+400
 heat-map?
 heat-map?
 1
@@ -383,10 +393,10 @@ heat-map?
 -1000
 
 INPUTBOX
-1419
-390
-1557
-474
+284
+407
+422
+491
 heatmap-seconds
 100.0
 1
@@ -394,21 +404,21 @@ heatmap-seconds
 Number
 
 INPUTBOX
-1468
-180
-1540
-264
+405
+177
+477
+261
 velocity
-0.0
+20.0
 1
 0
 Number
 
 INPUTBOX
-1246
-430
-1337
-490
+185
+407
+278
+473
 heatmap-buffer
 10.0
 1
@@ -416,15 +426,153 @@ heatmap-buffer
 Number
 
 INPUTBOX
-1242
-62
-1458
-122
+180
+60
+396
+120
 filename
-uni-maze.png
+plaza.png
 1
 0
 String
+
+TEXTBOX
+558
+245
+773
+288
+choose 2 patches of known distance (um) and input thier coords and the distance to set the scale of the world
+11
+0.0
+1
+
+INPUTBOX
+552
+308
+610
+380
+patch1-x
+-192.0
+1
+0
+Number
+
+INPUTBOX
+613
+308
+674
+380
+patch1-y
+-192.0
+1
+0
+Number
+
+INPUTBOX
+678
+308
+734
+381
+patch2-x
+192.0
+1
+0
+Number
+
+INPUTBOX
+738
+308
+796
+381
+patch2-y
+-192.0
+1
+0
+Number
+
+INPUTBOX
+555
+395
+650
+471
+known-distance
+100.0
+1
+0
+Number
+
+TEXTBOX
+553
+85
+768
+143
+diffusion step, diffusion rotation, and average processive velocity in um, degrees, and um/s, respectivly, assuming dtau is 1/30 seconds\n
+11
+0.0
+1
+
+INPUTBOX
+551
+147
+633
+217
+diff-step
+0.14
+1
+0
+Number
+
+INPUTBOX
+638
+147
+718
+217
+diff-rot
+1.466
+1
+0
+Number
+
+INPUTBOX
+725
+147
+811
+217
+velocity
+20.0
+1
+0
+Number
+
+SLIDER
+430
+20
+603
+53
+turtle-size
+turtle-size
+1
+10
+2.9
+.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+607
+20
+780
+53
+trace-thickness
+trace-thickness
+0
+10
+2.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
