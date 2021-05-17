@@ -2,3 +2,4 @@
 *.png
 *~
 *.swp
+.sim2.tmp.nlogo

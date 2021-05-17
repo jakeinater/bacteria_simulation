@@ -36,7 +36,7 @@ patches-own [
 to setup
   clear-all
 
-  import-pcolors "uni-maze.png"
+  import-pcolors filename
   random-seed 100
   setup-turtles
   setup-walls
@@ -63,9 +63,9 @@ to go
     ]
     update-heatmap
   ]
-  ;;diffuse-turtles
-  forward-turtles
-
+  diffuse-turtles
+  forward-turtles-pingpong
+  kill-outside ;;kills any turtles that make it out of the channels
 
   tick
 end
@@ -99,7 +99,11 @@ to update-heatmap
 end
 
 to calc-heatmap
-  let tmp (max [heat] of turtles)
+  ;; set the heat surrounding the start to be 0 to increase constrast
+  ask [patches in-radius heatmap-buffer] of patch start-x start-y [
+    set heat 0
+  ]
+  let tmp (max [heat] of patches)
   if tmp >= heatmap-max [
     set heatmap-max tmp
   ]
@@ -129,16 +133,24 @@ to diffuse-turtles
 
     let tmp (random 4)
     if tmp = 0 [
-      setxy xcor (ycor + dl)
+      if not [wall?] of patch-at 0 (dl) [
+        setxy xcor (ycor + dl) ;;otherwise bounce back to original position -> do nothing
+      ]
     ]
     if tmp = 1 [
-      setxy xcor (ycor - dl)
+      if not [wall?] of patch-at 0 (- dl) [
+        setxy xcor (ycor - dl)
+      ]
     ]
     if tmp = 2 [
-      setxy (xcor + dl) ycor
+      if not [wall?] of patch-at (dl) 0 [
+        setxy (xcor + dl) ycor
+      ]
     ]
     if tmp = 3 [
-      setxy (xcor - dl) ycor
+      if not [wall?] of patch-at (- dl) 0 [
+        setxy (xcor - dl) ycor
+      ]
     ]
   ]
 
@@ -153,10 +165,10 @@ to diffuse-turtles
 
 end
 
-to forward-turtles
+to forward-turtles-pingpong
   ask turtles [
     let here patch-here
-    let proximal-patches ((walls in-cone (df + .708) (180 - 2 * dtheta)) with [not (self = here)])
+    let proximal-patches ((walls in-cone (df + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
     let walls-infront (min-one-of proximal-patches [distance myself])
     ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
     ;;print walls-infront
@@ -210,12 +222,19 @@ to sobel
   ]
 end
 
+to kill-outside
+  ask turtles [
+    if [pcolor] of patch-here = 2 [ die ]
+  ]
+end
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 151
 10
-2164
-2024
+1164
+1024
 -1
 -1
 5.0
@@ -228,10 +247,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--200
-200
--200
-200
+-100
+100
+-100
+100
 1
 1
 1
@@ -264,40 +283,40 @@ num-bacteria
 num-bacteria
 1
 100
-49.0
+100.0
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-1241
-86
-1436
-131
+1244
+126
+1439
+171
 agent
 agent
 "E.coli"
 0
 
 INPUTBOX
-1241
-160
-1313
-244
+1244
+180
+1316
+264
 start-x
-0.0
+1.0
 1
 0
 Number
 
 INPUTBOX
-1317
-160
-1389
-244
+1320
+180
+1392
+264
 start-y
--95.0
+-96.0
 1
 0
 Number
@@ -320,10 +339,10 @@ NIL
 0
 
 SWITCH
-1243
-255
-1452
-288
+1246
+276
+1455
+309
 uniform-head?
 uniform-head?
 0
@@ -331,10 +350,10 @@ uniform-head?
 -1000
 
 INPUTBOX
-1390
-160
-1462
-244
+1393
+180
+1465
+264
 init-head
 0.0
 1
@@ -342,10 +361,10 @@ init-head
 Number
 
 SWITCH
-1243
-311
-1414
-344
+1246
+332
+1417
+365
 trace-path?
 trace-path?
 0
@@ -353,10 +372,10 @@ trace-path?
 -1000
 
 SWITCH
-1243
-368
-1407
-401
+1246
+389
+1410
+422
 heat-map?
 heat-map?
 1
@@ -364,10 +383,10 @@ heat-map?
 -1000
 
 INPUTBOX
-1416
-370
-1554
-454
+1419
+390
+1557
+474
 heatmap-seconds
 100.0
 1
@@ -375,15 +394,37 @@ heatmap-seconds
 Number
 
 INPUTBOX
-1465
-160
-1537
-244
+1468
+180
+1540
+264
 velocity
 0.0
 1
 0
 Number
+
+INPUTBOX
+1246
+430
+1337
+490
+heatmap-buffer
+10.0
+1
+0
+Number
+
+INPUTBOX
+1242
+62
+1458
+122
+filename
+uni-maze.png
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
