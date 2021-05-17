@@ -1,5 +1,5 @@
 *.csv
-*.png
 *~
 *.swp
 .sim2.tmp.nlogo
+netlogo/*.png

@@ -36,7 +36,7 @@ patches-own [
 to setup
   clear-all
 
-  import-pcolors filename
+  import-pcolors (word "../assets/" filename)
   random-seed 100
   setup-turtles
   setup-walls
