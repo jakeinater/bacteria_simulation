@@ -179,7 +179,7 @@ end
 to forward-turtles-pingpong
   ask turtles [
     let here patch-here
-    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180 - 2 * dtheta)) with [not (self = here)]) ;; - 2 * dtheta
     let walls-infront (min-one-of proximal-patches [distance myself])
     ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
     ;;print walls-infront
@@ -303,7 +303,7 @@ num-bacteria
 num-bacteria
 1
 100
-5.0
+10.0
 1
 1
 NIL
@@ -398,7 +398,7 @@ SWITCH
 400
 heat-map?
 heat-map?
-0
+1
 1
 -1000
 
@@ -563,7 +563,7 @@ turtle-size
 turtle-size
 1
 10
-7.0
+6.5
 .1
 1
 NIL
@@ -578,7 +578,7 @@ trace-thickness
 trace-thickness
 0
 10
-7.0
+5.0
 1
 1
 NIL
