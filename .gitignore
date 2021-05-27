@@ -3,3 +3,6 @@
 *.swp
 .sim2.tmp.nlogo
 netlogo/*.png
+videos
+.biased-turn.tmp.nlogo
+
