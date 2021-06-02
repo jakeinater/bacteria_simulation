@@ -3,6 +3,8 @@
 ;; this model has a slight repulsion from the wall and has a parallel swimming scheme, it also has a biased rotational diffusion. Wheh the agents hit a wall,
 ;; the new angle is parallel to the wall
 ;;
+;; this model uses experimental turning
+;;
 ;; 30 ticks = 1 second
 ;; approximations: 2D, one species, all identical (same D, same size etc), eta ~= eta_water = 10e-3, tumbling ellipsoid (reality mixture of lengthwise and random?), T = 300K, kb =
 ;; 3 sub regimes:
@@ -19,6 +21,7 @@ globals [
   dtheta ;;degree, note this does NOT take into account flagella, likely much smaller, HOW can we determine this??? currently using papers approximation
   scale-pixels
   bact-rad
+  left-right
 
 ]
 
@@ -76,8 +79,8 @@ to go
     ]
     update-heatmap
   ]
-  if diffusion? [ diffuse-turtles ]
-  forward-turtles-pingpong
+  if diffusion? [ diffuse-turtles-experimental ]
+  forward-turtles-parallel
   kill-outside ;;kills any turtles that make it out of the channels
 
   tick
@@ -106,7 +109,9 @@ end
 
 to update-heatmap
   ask turtles [
-    set heat (heat + 1)
+    if heat < 3000 [ ;; add max to the heat for better contrast on heatmap
+      set heat (heat + 1)
+    ]
   ]
 
 end
@@ -122,7 +127,13 @@ to calc-heatmap
   ]
   ask patches [
     if not wall? and (not (pcolor = 2)) [
-      set pcolor ( 19.9 - (heat / heatmap-max) * 4)
+
+      ifelse heat = heatmap-max [
+        set pcolor 85
+      ][
+        set pcolor ( 19.9 - (heat / heatmap-max) * 4)
+      ]
+
     ]
   ]
 end
@@ -141,11 +152,10 @@ to setup-turtles
   ]
 end
 
-
-to diffuse-turtles
+to diffuse-turtles-experimental
   ask turtles [
-
     let tmp (random 4)
+
     if tmp = 0 [
       ifelse not [wall?] of patch-at 0 (dl) [
         setxy xcor (ycor + dl) ;;otherwise slight repulsion
@@ -177,17 +187,65 @@ to diffuse-turtles
   ]
 
   ask turtles [
-    let tmp (random 2)
-    ifelse tmp = 0 or biased-right and not biased-left [
-      set heading (heading + dtheta)
-    ][
-      set heading (heading - dtheta)
+    if ticks mod 6 = 0 [ ;; assume 5 frames/second
+
+      let tmp (random 1000)
+      let tmp2 (random 2)
+      ifelse tmp2 = 0 [
+        set left-right 1 ;;turn right
+      ][
+        set left-right (-1) ;;turn left
+      ]
+
+      ifelse tmp < 690 [
+      set heading (heading)
+      ][
+
+        ifelse tmp < (690 + 150) [
+          set heading (heading + left-right * 10)
+        ][
+
+          ifelse tmp < (690 + 150 + 70) [
+            set heading (heading + left-right * 20)
+          ][
+
+            ifelse tmp < (690 + 150 + 70 + 35) [
+              set heading (heading + left-right * 30)
+            ][
+
+              ifelse tmp < (690 + 150 + 70 + 35 + 10) [
+                set heading (heading + left-right * 40)
+              ][
+
+                ifelse tmp < (690 + 150 + 70 + 35 + 10 + 20) [
+                  set heading (heading + left-right * 45)
+                ][
+
+                  ifelse tmp < (690 + 150 + 70 + 35 + 10 + 20 + 10) [
+                    set heading (heading + left-right * 50)
+                  ][
+
+
+
+                  ]
+
+                ]
+
+              ]
+
+            ]
+
+          ]
+
+        ]
+
+      ]
     ]
   ]
 
 end
 
-to forward-turtles-pingpong
+to forward-turtles-parallel
   ask turtles [
     let here patch-here
     let proximal-patches ((walls in-cone (bact-rad + .708) (90)) with [not (self = here)]) ;; - 2 * dtheta
@@ -397,7 +455,7 @@ SWITCH
 400
 heat-map?
 heat-map?
-1
+0
 1
 -1000
 
