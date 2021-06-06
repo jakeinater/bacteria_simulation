@@ -310,8 +310,8 @@ end
 GRAPHICS-WINDOW
 1098
 53
-1611
-567
+1311
+267
 -1
 -1
 5.0
@@ -324,10 +324,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--50
-50
--50
-50
+-20
+20
+-20
+20
 1
 1
 1
@@ -455,7 +455,7 @@ SWITCH
 400
 heat-map?
 heat-map?
-0
+1
 1
 -1000
 
@@ -487,7 +487,7 @@ INPUTBOX
 278
 473
 heatmap-buffer
-5.0
+1.0
 1
 0
 Number
@@ -519,7 +519,7 @@ INPUTBOX
 610
 380
 patch1-x
-44.0
+19.0
 1
 0
 Number
@@ -530,7 +530,7 @@ INPUTBOX
 674
 380
 patch1-y
-44.0
+19.0
 1
 0
 Number
@@ -541,7 +541,7 @@ INPUTBOX
 734
 381
 patch2-x
--44.0
+-19.0
 1
 0
 Number
@@ -552,7 +552,7 @@ INPUTBOX
 796
 381
 patch2-y
-44.0
+19.0
 1
 0
 Number
@@ -620,7 +620,7 @@ turtle-size
 turtle-size
 1
 10
-4.9
+2.0
 .1
 1
 NIL
@@ -635,7 +635,7 @@ trace-thickness
 trace-thickness
 0
 10
-4.0
+2.0
 1
 1
 NIL

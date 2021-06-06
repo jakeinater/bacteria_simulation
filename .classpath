@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="netlogo/ext/example/src/main/java"/>
+	<classpathentry kind="src" path="mazeGraph"/>
+	<classpathentry kind="lib" path="netlogo/ext/example/example.jar"/>
+	<classpathentry kind="output" path="netlogo/ext/example/classes"/>
+</classpath>
