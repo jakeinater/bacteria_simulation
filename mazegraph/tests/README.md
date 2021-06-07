@@ -16,7 +16,7 @@ SINK: ID edgeID
 XProb:
 coming from top (imagine +): 
 ```
-pLeft, pRight, pForward, pBack
+pLeft, pForward, pRight, pBack
 ```
 
 TProb:

@@ -1,10 +1,9 @@
-package junctions;
+package mazegraph.junctions;
 
 public abstract class Junction {
 	
 	private int junctionID;
-	private int x;
-	private int y;
+	private int x, y;
 	
 	public Junction(int ID) {
 		junctionID = ID;
@@ -13,5 +12,7 @@ public abstract class Junction {
 	public int getID() {
 		return junctionID;
 	}
+	
+	//public abstract void getProbabilities();
 	
 }
