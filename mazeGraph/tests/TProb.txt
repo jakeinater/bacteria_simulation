@@ -1,0 +1,7 @@
+coming from left: prob going to middle, prob going to right (must add up to 1)
+.60 .40
+coming from middle: prob going left, prob going right
+.50 .50
+coming from right: prob going to middle, prob going to left
+.60 .40
+
