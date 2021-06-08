@@ -1,5 +1,7 @@
 package junctions;
 import core.DirEdge;
+import java.util.ArrayDeque;
+import utils.Triplet;
 
 public class Sink extends Junction {
 	private DirEdge prev;
@@ -8,4 +10,9 @@ public class Sink extends Junction {
 		super(ID);
 		this.prev = new DirEdge(ID, prev);
 	}
+	
+	@Override
+	public void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q) {
+	}
+
 }

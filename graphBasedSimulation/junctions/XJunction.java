@@ -3,7 +3,9 @@ package junctions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.ArrayDeque;
 
+import utils.Triplet;
 import core.DirEdge;
 import utils.QuartetProbabilities;
 
@@ -23,10 +25,10 @@ public class XJunction extends Junction {
 				String[] line = f.nextLine().split("\\s+");
 				if (line.length != 4) throw new RuntimeException("expect 4 args, got " + line.length);
 				p = new QuartetProbabilities<>(
-						Double.parseDouble(line[0]), 
-						Double.parseDouble(line[1]), 
-						Double.parseDouble(line[2]), 
-						Double.parseDouble(line[3])
+						Double.parseDouble(line[0]) / 100., 
+						Double.parseDouble(line[1]) / 100., 
+						Double.parseDouble(line[2]) / 100., 
+						Double.parseDouble(line[3]) / 100.
 						);
 		
 			} catch (FileNotFoundException e) {
@@ -42,4 +44,53 @@ public class XJunction extends Junction {
 		e3 = new DirEdge(ID, e3ID);
 		e4 = new DirEdge(ID, e4ID);
 	}
+	
+	@Override
+	public void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q) {
+		if (numAgents<MIN) return; //below threshold
+		
+		if (prevID == e1.getDest()) {
+			//from e1
+			e1.incr(p.pBack * numAgents);
+			e3.incr(p.pForward * numAgents);
+			e4.incr(p.pRight * numAgents);
+			e2.incr(p.pLeft * numAgents);
+			q.add(new Triplet<>(this.getID(), p.pBack * numAgents, e1.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pForward * numAgents, e3.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pRight * numAgents, e4.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pLeft * numAgents, e2.getDest()));
+		} else if (prevID == e2.getDest()) {
+			//e2
+			e2.incr(p.pBack * numAgents);
+			e4.incr(p.pForward * numAgents);
+			e1.incr(p.pRight * numAgents);
+			e3.incr(p.pLeft * numAgents);
+			q.add(new Triplet<>(this.getID(), p.pBack * numAgents, e2.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pForward * numAgents, e4.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pRight * numAgents, e1.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pLeft * numAgents, e3.getDest()));
+		} else if (prevID == e3.getDest()) {
+			//e3
+			e3.incr(p.pBack * numAgents);
+			e1.incr(p.pForward * numAgents);
+			e2.incr(p.pRight * numAgents);
+			e4.incr(p.pLeft * numAgents);
+			q.add(new Triplet<>(this.getID(), p.pBack * numAgents, e3.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pForward * numAgents, e1.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pRight * numAgents, e2.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pLeft * numAgents, e4.getDest()));
+		} else {
+			//e4
+			e4.incr(p.pBack * numAgents);
+			e2.incr(p.pForward * numAgents);
+			e3.incr(p.pRight * numAgents);
+			e1.incr(p.pLeft * numAgents);
+			q.add(new Triplet<>(this.getID(), p.pBack * numAgents, e4.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pForward * numAgents, e2.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pRight * numAgents, e3.getDest()));
+			q.add(new Triplet<>(this.getID(), p.pLeft * numAgents, e1.getDest()));
+		}
+	}
+
+	
 }

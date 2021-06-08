@@ -3,7 +3,7 @@ import java.io.*;
 import java.util.*;
 
 import junctions.*;
-
+import utils.Triplet;
 
 
 enum Type {
@@ -23,7 +23,8 @@ public class Graph {
 	//also must define a source and sink, both have one edge, source junction has 100% agents entering it
 	//sink has it such that when an agent enters it, it no longer continues
 	
-	private ArrayList<Junction> nodes = new ArrayList<>();
+	private Junction[] nodes;
+	private int startID;
 	
 	Graph(){
 	}
@@ -32,72 +33,72 @@ public class Graph {
 		//TODO: move the line parsing into their respective constructors
 		try {
 			Scanner f = new Scanner(new File(file));
+			Scanner count = new Scanner(new File(file));
+			
+			int i = 0;
+			while (count.hasNextLine()) {
+				i++;
+				count.nextLine();
+			}
+			
+			this.nodes = new Junction[i];
+
 			String[] line;
 			int ID;
 			
 			while (f.hasNext()) {
 				line = f.nextLine().split("\\s+");
 				ID = Integer.parseInt(line[0]);
-				//if (nodes.get(ID) != null) throw new RuntimeException("ID has already been used");
+				if (nodes[ID] != null) throw new RuntimeException("ID has already been used");
 				
 				switch (Type.valueOf(line[1])) {
 				case T:
 					//3 neigbours: leftID baseID rightID
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes.add( 
-							new TJunction( ID, 
-									Integer.parseInt(line[2]), 
-									Integer.parseInt(line[3]), 
-									Integer.parseInt(line[4])
-									)
+					nodes[ID] =  new TJunction( ID, 
+							Integer.parseInt(line[2]), 
+							Integer.parseInt(line[3]), 
+							Integer.parseInt(line[4])
 							);
 					break;
+				
 				case X:
 					//4 neighbours: firstID secondID thirdID fourthID
 					if (line.length != 6) throw new RuntimeException("there are " + line.length + "arguments while 6 are needed");
-					nodes.add(
-							new XJunction( ID,
-									Integer.parseInt(line[2]),
-									Integer.parseInt(line[3]),
-									Integer.parseInt(line[4]),
-									Integer.parseInt(line[5])
-									)
+					nodes[ID] = new XJunction( ID,
+							Integer.parseInt(line[2]),
+							Integer.parseInt(line[3]),
+							Integer.parseInt(line[4]),
+							Integer.parseInt(line[5])
 							);
 					break;
 				case L:
 					//2 neighbours: leftID rightID
 					if (line.length != 4) throw new RuntimeException("there are " + line.length + "arguments while 4 are needed");
-					nodes.add(
-							new LJunction( ID,
-									Integer.parseInt(line[2]),
-									Integer.parseInt(line[3])
-									)
+					nodes[ID] = new LJunction( ID,
+							Integer.parseInt(line[2]),
+							Integer.parseInt(line[3])
 							);
 					break;
 				case Y:
 					//3 neighbours: leftID baseID rightID
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes.add( 
-							new YJunction( ID, 
-									Integer.parseInt(line[2]), 
-									Integer.parseInt(line[3]), 
-									Integer.parseInt(line[4])
-									)
+					nodes[ID] = new YJunction( ID, 
+							Integer.parseInt(line[2]), 
+							Integer.parseInt(line[3]), 
+							Integer.parseInt(line[4])
 							);
 					break;
 				case SOURCE:
 					//1 neighbour: edgeID
 					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes.add(
-							new Source( ID,
-									Integer.parseInt(line[2])
-									)
-							);
+					nodes[ID] = new Source( ID, Integer.parseInt(line[2]));
+					startID = ID;
 					break;
 				case SINK:
 					//1 neighbour: edgeID
 					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes.add( new Sink( ID, Integer.parseInt(line[2])));
+					nodes[ID] = new Sink( ID, Integer.parseInt(line[2]));
 					break;
 				default:
 					System.out.println("not defined");
@@ -117,6 +118,34 @@ public class Graph {
 			System.exit(1);
 		}
 	}
+	
+	public void solve() {
+		
+		System.out.println("solving...");
+	
+		double numAgents = 1000;
+		//final double MIN = 1;
+		//we need to store the prev node, the number of agents entering the next node, and the next node, 
+		//while incrementing the prev node
+		//Pair<prevID, num agents>
+		//if (agents < MIN) return;
+		
+		ArrayDeque<Triplet<Integer, Double, Integer>> q = new ArrayDeque<>();
+		Triplet<Integer, Double, Integer> cur;
+		/*int nextID = ((Source) nodes[startID]).getNext(agents);
+		Triplet<Integer, Double, Integer> cur = new Triplet<>(
+				((Source) nodes[startID]).getID(),
+				agents, 
+				((Source) nodes[startID]).getNext(agents));
+		q.add(cur);*/
+		nodes[startID].passThrough(0, numAgents, q);
+		while (!q.isEmpty()) {
+			cur = q.remove();
+			nodes[cur.e3].passThrough(cur.e1, cur.e2, q);
+		}
+		
+		System.out.println("done!");
+	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -127,7 +156,7 @@ public class Graph {
 		System.out.println(path);
 		//File f = new File(path);
 		Graph g = new Graph(path);
-
+		g.solve();
 	}
 
 }
