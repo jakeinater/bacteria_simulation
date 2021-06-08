@@ -23,7 +23,7 @@ public class Graph {
 	//also must define a source and sink, both have one edge, source junction has 100% agents entering it
 	//sink has it such that when an agent enters it, it no longer continues
 	
-	private ArrayList<Junction> nodes;
+	private ArrayList<Junction> nodes = new ArrayList<>();
 	
 	Graph(){
 	}
@@ -38,24 +38,24 @@ public class Graph {
 			while (f.hasNext()) {
 				line = f.nextLine().split("\\s+");
 				ID = Integer.parseInt(line[0]);
-				if (nodes.get(ID) != null) throw new RuntimeException("ID has already been used");
+				//if (nodes.get(ID) != null) throw new RuntimeException("ID has already been used");
 				
 				switch (Type.valueOf(line[1])) {
 				case T:
 					//3 neigbours: leftID baseID rightID
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes.add( ID, 
+					nodes.add( 
 							new TJunction( ID, 
 									Integer.parseInt(line[2]), 
 									Integer.parseInt(line[3]), 
-									Integer.parseInt(line[5])
+									Integer.parseInt(line[4])
 									)
 							);
 					break;
 				case X:
 					//4 neighbours: firstID secondID thirdID fourthID
 					if (line.length != 6) throw new RuntimeException("there are " + line.length + "arguments while 6 are needed");
-					nodes.add( ID,
+					nodes.add(
 							new XJunction( ID,
 									Integer.parseInt(line[2]),
 									Integer.parseInt(line[3]),
@@ -67,7 +67,7 @@ public class Graph {
 				case L:
 					//2 neighbours: leftID rightID
 					if (line.length != 4) throw new RuntimeException("there are " + line.length + "arguments while 4 are needed");
-					nodes.add(ID,
+					nodes.add(
 							new LJunction( ID,
 									Integer.parseInt(line[2]),
 									Integer.parseInt(line[3])
@@ -77,18 +77,18 @@ public class Graph {
 				case Y:
 					//3 neighbours: leftID baseID rightID
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes.add( ID, 
+					nodes.add( 
 							new YJunction( ID, 
 									Integer.parseInt(line[2]), 
 									Integer.parseInt(line[3]), 
-									Integer.parseInt(line[5])
+									Integer.parseInt(line[4])
 									)
 							);
 					break;
 				case SOURCE:
 					//1 neighbour: edgeID
 					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes.add(ID,
+					nodes.add(
 							new Source( ID,
 									Integer.parseInt(line[2])
 									)
@@ -97,7 +97,7 @@ public class Graph {
 				case SINK:
 					//1 neighbour: edgeID
 					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes.add(ID, new Sink( ID, Integer.parseInt(line[2])));
+					nodes.add( new Sink( ID, Integer.parseInt(line[2])));
 					break;
 				default:
 					System.out.println("not defined");
@@ -123,8 +123,9 @@ public class Graph {
 		
 		//String maze = args[0];
 		String maze = "uni-maze.txt";
-		String path = "tests/" + maze;
-		File f = new File(path);
+		String path = "graphBasedSimulation/core/tests/" + maze;
+		System.out.println(path);
+		//File f = new File(path);
 		Graph g = new Graph(path);
 
 	}

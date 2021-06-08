@@ -16,7 +16,7 @@ public class YJunction extends Junction {
 		super(ID);
 		if (!initialized) {
 			try {
-				String path = "tests/" + "YProb-uni.txt";
+				String path = "graphBasedSimulation/core/tests/" + "YProb.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");
@@ -35,7 +35,7 @@ public class YJunction extends Junction {
 					(Double.parseDouble(line[0]), Double.parseDouble(line[1]), Double.parseDouble(line[2]));
 				
 			} catch (FileNotFoundException e) {
-				System.out.println("file not found");
+				System.out.println("Y file not found");
 				System.exit(1);
 			}
 			

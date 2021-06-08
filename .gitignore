@@ -7,3 +7,4 @@ videos
 .biased-turn.tmp.nlogo
 
 /out/
+*.class

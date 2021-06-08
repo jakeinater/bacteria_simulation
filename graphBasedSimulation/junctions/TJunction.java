@@ -17,7 +17,7 @@ public class TJunction extends Junction {
 		
 		if (!initialized) {
 			try {
-				String path = "tests/" + "TProb-uni.txt";
+				String path = "graphBasedSimulation/core/tests/" + "TProb-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");
@@ -36,7 +36,7 @@ public class TJunction extends Junction {
 					(Double.parseDouble(line[0]), Double.parseDouble(line[1]), Double.parseDouble(line[2]));
 				
 			} catch (FileNotFoundException e) {
-				System.out.println("file not found");
+				System.out.println("T file not found");
 				System.exit(1);
 			}
 			

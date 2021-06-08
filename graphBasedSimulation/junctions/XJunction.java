@@ -17,7 +17,7 @@ public class XJunction extends Junction {
 		super(ID);
 		if (!initialized) {
 			try {
-				String path = "tests/" + "XProb-uni.txt";
+				String path = "graphBasedSimulation/core/tests/" + "XProb-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");
@@ -30,7 +30,7 @@ public class XJunction extends Junction {
 						);
 		
 			} catch (FileNotFoundException e) {
-				System.out.println("file not found");
+				System.out.println("X file not found");
 				System.exit(1);
 			}
 			
