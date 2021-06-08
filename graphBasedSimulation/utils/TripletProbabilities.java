@@ -1,4 +1,4 @@
-package mazegraph.utils;
+package utils;
 
 public class TripletProbabilities<E1, E2, E3> {
 	final public E1 pLeft;

@@ -1,4 +1,4 @@
-package mazegraph.junctions;
+package junctions;
 
 public abstract class Junction {
 	

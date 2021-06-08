@@ -1,8 +1,8 @@
-package mazegraph;
+package core;
 import java.io.*;
 import java.util.*;
 
-import mazegraph.junctions.*;
+import junctions.*;
 
 
 
@@ -97,11 +97,7 @@ public class Graph {
 				case SINK:
 					//1 neighbour: edgeID
 					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes.add(ID,
-							new Sink( ID,
-									Integer.parseInt(line[2])
-									)
-							);
+					nodes.add(ID, new Sink( ID, Integer.parseInt(line[2])));
 					break;
 				default:
 					System.out.println("not defined");

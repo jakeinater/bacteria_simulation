@@ -1,4 +1,4 @@
-package mazegraph.utils;
+package utils;
 
 public class Pair<E1, E2> {
 	public final E1 e1;

@@ -1,4 +1,4 @@
-package mazegraph;
+package core;
 
 public class DirEdge {
 	

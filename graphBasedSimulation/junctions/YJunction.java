@@ -1,8 +1,9 @@
-package mazegraph.junctions;
+package junctions;
 import java.io.*;
 import java.util.*;
-import mazegraph.DirEdge;
-import mazegraph.utils.*;
+
+import core.DirEdge;
+import utils.*;
 
 public class YJunction extends Junction {
 	private DirEdge left, mid, right;

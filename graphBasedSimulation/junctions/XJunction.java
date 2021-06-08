@@ -1,11 +1,11 @@
-package mazegraph.junctions;
+package junctions;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import mazegraph.DirEdge;
-import mazegraph.utils.QuartetProbabilities;
+import core.DirEdge;
+import utils.QuartetProbabilities;
 
 public class XJunction extends Junction {
 	private DirEdge e1, e2, e3, e4; //defined counter clockwise

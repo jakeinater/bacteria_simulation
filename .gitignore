@@ -6,3 +6,4 @@ netlogo/*.png
 videos
 .biased-turn.tmp.nlogo
 
+/out/

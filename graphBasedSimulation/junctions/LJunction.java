@@ -1,5 +1,5 @@
-package mazegraph.junctions;
-import mazegraph.DirEdge;
+package junctions;
+import core.DirEdge;
 
 public class LJunction extends Junction {
 	
