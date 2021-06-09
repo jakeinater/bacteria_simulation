@@ -2,6 +2,7 @@ package junctions;
 import core.DirEdge;
 import java.util.ArrayDeque;
 import utils.Triplet;
+import org.w3c.dom.*;
 
 public class LJunction extends Junction {
 	
@@ -27,5 +28,10 @@ public class LJunction extends Junction {
 		}
 	}
 
-	
+	@Override
+	public void addEdgesXML(Document doc, Element graphElement, String d2) {
+		addEdgeXML(doc, graphElement, d2, e1);
+		addEdgeXML(doc, graphElement, d2, e2);
+	}
+
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.ArrayDeque;
+import org.w3c.dom.*;
 
 import utils.Triplet;
 import core.DirEdge;
@@ -92,5 +93,12 @@ public class XJunction extends Junction {
 		}
 	}
 
-	
+	@Override
+	public void addEdgesXML(Document doc, Element graphElement, String d2) {
+		addEdgeXML(doc, graphElement, d2, e1);		
+		addEdgeXML(doc, graphElement, d2, e2);		
+		addEdgeXML(doc, graphElement, d2, e3);		
+		addEdgeXML(doc, graphElement, d2, e4);		
+	}
+
 }

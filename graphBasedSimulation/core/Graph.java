@@ -4,7 +4,7 @@ import java.util.*;
 
 import junctions.*;
 import utils.Triplet;
-
+import io.xml.WriteXML;
 
 enum Type {
 	SOURCE, Y, T, X, L, SINK 
@@ -161,7 +161,9 @@ public class Graph {
 		System.out.println(path);
 		//File f = new File(path);
 		Graph g = new Graph(path);
+		WriteXML.write(g, "test_init");
 		g.solve();
+		WriteXML.write(g, "test_solved");
 	}
 
 }

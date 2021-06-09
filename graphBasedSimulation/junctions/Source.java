@@ -2,6 +2,7 @@ package junctions;
 import core.DirEdge;
 import java.util.ArrayDeque;
 import utils.Triplet;
+import org.w3c.dom.*;
 
 public class Source extends Junction {
 	private DirEdge next;
@@ -17,4 +18,10 @@ public class Source extends Junction {
 		next.incr(numAgents);
 		q.add(new Triplet<>(this.getID(), numAgents, next.getDest()));
 	}
+	
+	@Override
+	public void addEdgesXML(Document doc, Element graphElement, String d2) {
+		addEdgeXML(doc, graphElement, d2, next);
+	}
+
 }

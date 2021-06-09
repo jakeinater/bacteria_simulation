@@ -5,11 +5,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.*;
 import java.io.File;
-import java.io.IOException;
 
 import core.*;
 import junctions.*;
-import utils.*;
 
 
 public class WriteXML {
@@ -23,7 +21,7 @@ public class WriteXML {
 			
 			//root element
 			Element rootElement = doc.createElement("graphml");
-			rootElement.appendChild(rootElement);
+			doc.appendChild(rootElement);
 			
 			Attr xmlns = doc.createAttribute("xmlns");
 			xmlns.setValue("http://graphml.graphdrawing.org/xmlns");
@@ -42,63 +40,33 @@ public class WriteXML {
 			Element key1 = doc.createElement("key");
 			rootElement.appendChild(key1);
 			
-			Attr d2 = doc.createAttribute("id");
-			d2.setNodeValue("d2");
-			key1.setAttributeNode(d2);
-			
-			Attr forEdge = doc.createAttribute("for");
-			forEdge.setNodeValue("edge");
-			key1.setAttributeNode(forEdge);
-
-			Attr nameWeight = doc.createAttribute("attr.name");
-			nameWeight.setNodeValue("weight");
-			key1.setAttributeNode(nameWeight);
-
-			Attr typeDouble = doc.createAttribute("attr.type");
-			typeDouble.setNodeValue("double");
-			key1.setAttributeNode(typeDouble);
+			key1.setAttribute("id", "d2");
+			key1.setAttribute("for", "edge");
+			key1.setAttribute("attr.name", "weight");
+			key1.setAttribute("attr.type", "double");
 
 			//Y
 			Element key2 = doc.createElement("key");
 			rootElement.appendChild(key2);
-			
-			Attr d1 = doc.createAttribute("id");
-			d1.setNodeValue("d1");
-			key2.setAttributeNode(d1);
-			
-			Attr forNode = doc.createAttribute("for");
-			forNode.setNodeValue("node");
-			key2.setAttributeNode(forNode);
-
-			Attr nameY = doc.createAttribute("attr.name");
-			nameY.setNodeValue("y");
-			key2.setAttributeNode(nameY);
-
-			key2.setAttributeNode(typeDouble);
+	
+			key2.setAttribute("id", "d1");
+			key2.setAttribute("for", "node");
+			key2.setAttribute("attr.name", "y");
+			key2.setAttribute("attr.type", "double");
 
 			//X
 			Element key3 = doc.createElement("key");
 			rootElement.appendChild(key3);
-			
-			Attr d0 = doc.createAttribute("id");
-			d0.setNodeValue("d0");
-			key3.setAttributeNode(d0);
-			
-			key3.setAttributeNode(forNode);
 
-			Attr nameX = doc.createAttribute("attr.name");
-			nameX.setNodeValue("x");
-			key3.setAttributeNode(nameX);
-
-			key3.setAttributeNode(typeDouble);
-
+			key3.setAttribute("id", "d0");
+			key3.setAttribute("for", "node");
+			key3.setAttribute("attr.name", "y");
+			key3.setAttribute("attr.type", "double");
+		
 			//graph element
 			Element graph = doc.createElement("graph");
 			rootElement.appendChild(graph);
-			Attr edgedefault = doc.createAttribute("edgedefault");
-			edgedefault.setNodeValue("directed");
-			graph.setAttributeNode(edgedefault);
-
+			graph.setAttribute("edgedefault", "directed");
 			
 			//nodes and edges
 			Junction[] arr = g.getJunctions();
@@ -110,21 +78,19 @@ public class WriteXML {
 				
 				Element node = doc.createElement("node");
 				graph.appendChild(node);
-				Attr id = doc.createAttribute("id");
-				id.setNodeValue(Integer.toString(cur.getID()));
-				node.setAttributeNode(id);
+				node.setAttribute("id", Integer.toString(cur.getID()));
 				
 				Element dataX = doc.createElement("data");
 				Element dataY = doc.createElement("data");
 				node.appendChild(dataX);
 				node.appendChild(dataY);
-				dataX.setAttributeNode(d0);
-				dataY.setAttributeNode(d1);
+				dataX.setAttribute("key", "d0");
+				dataY.setAttribute("key", "d1");
 				dataX.appendChild(doc.createTextNode(Double.toString(cur.getX())));
 				dataY.appendChild(doc.createTextNode(Double.toString(cur.getY())));
 		
 				//method that appends the edge XML elements to graph element
-				cur.addEdgesXML(doc, graph, d2);
+				cur.addEdgesXML(doc, graph, "d1");
 			}
 			
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();

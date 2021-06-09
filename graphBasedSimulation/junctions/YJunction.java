@@ -1,6 +1,7 @@
 package junctions;
 import java.io.*;
 import java.util.*;
+import org.w3c.dom.*;
 
 import core.DirEdge;
 import utils.*;
@@ -83,5 +84,13 @@ public class YJunction extends Junction {
 			q.add(new Triplet<>(this.getID(), pFromRight.pRight * numAgents, right.getDest()));
 		}
 	}
+	
+	@Override
+	public void addEdgesXML(Document doc, Element graphElement, String d2) {
+		addEdgeXML(doc, graphElement, d2, left);
+		addEdgeXML(doc, graphElement, d2, mid);	
+		addEdgeXML(doc, graphElement, d2, right);	
+	}
+
 
 }

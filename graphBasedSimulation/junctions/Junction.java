@@ -1,6 +1,7 @@
 package junctions;
 import java.util.ArrayDeque;
 import utils.Triplet;
+import core.DirEdge;
 import org.w3c.dom.*;
 
 public abstract class Junction {
@@ -20,16 +21,28 @@ public abstract class Junction {
 	//
 	public abstract void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q);
 	
-	//this method should take in a graph element and append an edge element with a source and target attribute,
-	//and the edge should have a data child element with attr key="d2" and a child: doc.createTextNode(weight)
-	public abstract void addEdgesXML(Document doc, Element graphElement, Attr d2);
-	
-	public double getX() {
+		public double getX() {
 		return x;
 	}
 	
 	public double getY() {
 		return y;
+	}
+
+	//this method should take in a graph element and append an edge element with a source and target attribute,
+	//and the edge should have a data child element with attr key="d2" and a child: doc.createTextNode(weight)
+	public abstract void addEdgesXML(Document doc, Element graphElement, String d2);
+	
+	void addEdgeXML(Document doc, Element graphElement, String d2, DirEdge e) {
+		Element edge = doc.createElement("edge");
+		graphElement.appendChild(edge);
+		edge.setAttribute("source", Integer.toString(e.getSrc()));
+		edge.setAttribute("target", Integer.toString(e.getDest()));
+		
+		Element data = doc.createElement("data");
+		edge.appendChild(data);
+		data.setAttribute("key", d2);
+		data.appendChild(doc.createTextNode(Double.toString(e.getWeight())));
 	}
 	
 }
