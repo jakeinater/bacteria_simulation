@@ -13,12 +13,12 @@ public class TJunction extends Junction {
 	//probabilities, e1 = pLeft, e2 = pRight, e3 = pMiddle
 	private static TripletProbabilities<Double, Double, Double> pFromMiddle, pFromLeft, pFromRight;
 	
-	public TJunction(int ID, int leftID, int midID, int rightID ) {
-		super(ID);
+	public TJunction(int ID, double x, double y, int leftID, int midID, int rightID ) {
+		super(ID, x, y);
 		
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/core/tests/" + "TProb-uni.txt";
+				String path = "graphBasedSimulation/assets/" + "TProb-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");

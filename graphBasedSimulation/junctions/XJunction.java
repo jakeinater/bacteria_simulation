@@ -16,11 +16,11 @@ public class XJunction extends Junction {
 
 	private static QuartetProbabilities<Double, Double, Double, Double> p;
 	
-	public XJunction(int ID, int e1ID, int e2ID, int e3ID, int e4ID ) {
-		super(ID);
+	public XJunction(int ID, double x, double y, int e1ID, int e2ID, int e3ID, int e4ID ) {
+		super(ID, x, y);
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/core/tests/" + "XProb-uni.txt";
+				String path = "graphBasedSimulation/assets/" + "XProb-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");

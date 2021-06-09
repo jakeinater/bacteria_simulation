@@ -7,8 +7,8 @@ import org.w3c.dom.*;
 public class Source extends Junction {
 	private DirEdge next;
 	
-	public Source(int ID, int next) {
-		super(ID);
+	public Source(int ID, double x, double y, int next) {
+		super(ID, x, y);
 		this.next = new DirEdge(ID, next);
 	}
 	

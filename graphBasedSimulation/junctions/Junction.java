@@ -10,8 +10,10 @@ public abstract class Junction {
 	private double x, y;
 	static final double MIN = 1;
 	
-	public Junction(int ID) {
+	public Junction(int ID, double x, double y) {
 		junctionID = ID;
+		this.x = x;
+		this.y = y;
 	}
 	
 	public int getID() {

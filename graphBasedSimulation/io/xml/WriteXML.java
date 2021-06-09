@@ -96,7 +96,7 @@ public class WriteXML {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("./out/" + filename + ".graphml"));
+			StreamResult result = new StreamResult(new File("./graphBasedSimulation/assets/" + filename + ".graphml"));
 			transformer.transform(source, result);
 		
 		} catch (TransformerException te) {

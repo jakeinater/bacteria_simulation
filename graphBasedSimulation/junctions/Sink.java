@@ -7,8 +7,8 @@ import org.w3c.dom.*;
 public class Sink extends Junction {
 	private DirEdge prev;
 	
-	public Sink(int ID, int prev) {
-		super(ID);
+	public Sink(int ID, double x, double y, int prev) {
+		super(ID, x, y);
 		this.prev = new DirEdge(ID, prev);
 	}
 	

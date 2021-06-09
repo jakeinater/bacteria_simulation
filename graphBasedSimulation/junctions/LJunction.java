@@ -9,8 +9,8 @@ public class LJunction extends Junction {
 	private DirEdge e1, e2;
 	
 	
-	public LJunction(int ID, int e1, int e2) {
-		super(ID);
+	public LJunction(int ID, double x, double y, int e1, int e2) {
+		super(ID, x, y);
 		this.e1 = new DirEdge(ID, e1);
 		this.e2 = new DirEdge(ID, e2);
 	}
@@ -21,9 +21,11 @@ public class LJunction extends Junction {
 		
 		if (prevID == e1.getDest()) {
 			//coming from e1
+			e2.incr(numAgents);
 			q.add(new Triplet<>(this.getID(), numAgents, e2.getDest()));
 		} else {
 			//coming from e2
+			e1.incr(numAgents);
 			q.add(new Triplet<>(this.getID(), numAgents, e1.getDest()));
 		}
 	}

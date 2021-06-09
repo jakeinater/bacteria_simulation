@@ -54,51 +54,65 @@ public class Graph {
 				switch (Type.valueOf(line[1])) {
 				case T:
 					//3 neigbours: leftID baseID rightID
-					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes[ID] =  new TJunction( ID, 
-							Integer.parseInt(line[2]), 
-							Integer.parseInt(line[3]), 
-							Integer.parseInt(line[4])
+					if (line.length != 7) throw new RuntimeException("there are " + line.length + "arguments while 7 are needed");
+					nodes[ID] =  new TJunction( ID,
+							Double.parseDouble(line[2]),
+							Double.parseDouble(line[3]),
+							Integer.parseInt(line[4]), 
+							Integer.parseInt(line[5]), 
+							Integer.parseInt(line[6])
 							);
 					break;
 				
 				case X:
 					//4 neighbours: firstID secondID thirdID fourthID
-					if (line.length != 6) throw new RuntimeException("there are " + line.length + "arguments while 6 are needed");
+					if (line.length != 8) throw new RuntimeException("there are " + line.length + "arguments while 8 are needed");
 					nodes[ID] = new XJunction( ID,
-							Integer.parseInt(line[2]),
-							Integer.parseInt(line[3]),
+							Double.parseDouble(line[2]),
+							Double.parseDouble(line[3]),
 							Integer.parseInt(line[4]),
-							Integer.parseInt(line[5])
+							Integer.parseInt(line[5]),
+							Integer.parseInt(line[6]),
+							Integer.parseInt(line[7])
 							);
 					break;
 				case L:
 					//2 neighbours: leftID rightID
-					if (line.length != 4) throw new RuntimeException("there are " + line.length + "arguments while 4 are needed");
+					if (line.length != 6) throw new RuntimeException("there are " + line.length + "arguments while 6 are needed");
 					nodes[ID] = new LJunction( ID,
-							Integer.parseInt(line[2]),
-							Integer.parseInt(line[3])
+							Double.parseDouble(line[2]),
+							Double.parseDouble(line[3]),
+							Integer.parseInt(line[4]),
+							Integer.parseInt(line[5])
 							);
 					break;
 				case Y:
 					//3 neighbours: leftID baseID rightID
-					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
+					if (line.length != 7) throw new RuntimeException("there are " + line.length + "arguments while 7 are needed");
 					nodes[ID] = new YJunction( ID, 
-							Integer.parseInt(line[2]), 
-							Integer.parseInt(line[3]), 
-							Integer.parseInt(line[4])
+							Double.parseDouble(line[2]),
+							Double.parseDouble(line[3]),
+							Integer.parseInt(line[4]), 
+							Integer.parseInt(line[5]), 
+							Integer.parseInt(line[6])
 							);
 					break;
 				case SOURCE:
 					//1 neighbour: edgeID
-					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes[ID] = new Source( ID, Integer.parseInt(line[2]));
+					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
+					nodes[ID] = new Source( ID,
+							Double.parseDouble(line[2]),
+							Double.parseDouble(line[3]),
+							Integer.parseInt(line[4]));
 					startID = ID;
 					break;
 				case SINK:
 					//1 neighbour: edgeID
-					if (line.length != 3) throw new RuntimeException("there are " + line.length + "arguments while 3 are needed");
-					nodes[ID] = new Sink( ID, Integer.parseInt(line[2]));
+					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
+					nodes[ID] = new Sink( ID,
+							Double.parseDouble(line[2]),
+							Double.parseDouble(line[3]),
+							Integer.parseInt(line[4]));
 					break;
 				default:
 					System.out.println("not defined");
@@ -157,7 +171,7 @@ public class Graph {
 		
 		//String maze = args[0];
 		String maze = "uni-maze.txt";
-		String path = "graphBasedSimulation/core/tests/" + maze;
+		String path = "graphBasedSimulation/assets/" + maze;
 		System.out.println(path);
 		//File f = new File(path);
 		Graph g = new Graph(path);
