@@ -60,7 +60,7 @@ public class WriteXML {
 
 			key3.setAttribute("id", "d0");
 			key3.setAttribute("for", "node");
-			key3.setAttribute("attr.name", "y");
+			key3.setAttribute("attr.name", "x");
 			key3.setAttribute("attr.type", "double");
 		
 			//graph element
@@ -90,17 +90,14 @@ public class WriteXML {
 				dataY.appendChild(doc.createTextNode(Double.toString(cur.getY())));
 		
 				//method that appends the edge XML elements to graph element
-				cur.addEdgesXML(doc, graph, "d1");
+				cur.addEdgesXML(doc, graph, "d2");
 			}
 			
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("./out/" + filename + ".xml"));
+			StreamResult result = new StreamResult(new File("./out/" + filename + ".graphml"));
 			transformer.transform(source, result);
-		
-			StreamResult consoleResult = new StreamResult(System.out);
-			transformer.transform(source, consoleResult);
 		
 		} catch (TransformerException te) {
 			System.out.println(te.getMessage());

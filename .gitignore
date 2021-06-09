@@ -7,3 +7,6 @@ videos
 .biased-turn.tmp.nlogo
 
 *.class
+/out/core/
+/out/
+env/
