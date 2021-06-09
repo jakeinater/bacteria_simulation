@@ -119,6 +119,10 @@ public class Graph {
 		}
 	}
 	
+	public Junction[] getJunctions(){
+		return nodes;
+	}
+	
 	public void solve() {
 		
 		System.out.println("solving...");
@@ -140,6 +144,7 @@ public class Graph {
 		q.add(cur);*/
 		nodes[startID].passThrough(0, numAgents, q);
 		while (!q.isEmpty()) {
+			System.out.println(q.size());
 			cur = q.remove();
 			nodes[cur.e3].passThrough(cur.e1, cur.e2, q);
 		}
