@@ -142,20 +142,13 @@ public class Graph {
 		System.out.println("solving...");
 	
 		double numAgents = 1000;
-		//final double MIN = 1;
 		//we need to store the prev node, the number of agents entering the next node, and the next node, 
 		//while incrementing the prev node
 		//Pair<prevID, num agents>
 		//if (agents < MIN) return;
-		
 		ArrayDeque<Triplet<Integer, Double, Integer>> q = new ArrayDeque<>();
 		Triplet<Integer, Double, Integer> cur;
-		/*int nextID = ((Source) nodes[startID]).getNext(agents);
-		Triplet<Integer, Double, Integer> cur = new Triplet<>(
-				((Source) nodes[startID]).getID(),
-				agents, 
-				((Source) nodes[startID]).getNext(agents));
-		q.add(cur);*/
+		
 		nodes[startID].passThrough(0, numAgents, q);
 		while (!q.isEmpty()) {
 			System.out.println(q.size());
@@ -170,14 +163,14 @@ public class Graph {
 		// TODO Auto-generated method stub
 		
 		//String maze = args[0];
-		String maze = "uni-maze.txt";
+		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/" + maze;
 		System.out.println(path);
 		//File f = new File(path);
 		Graph g = new Graph(path);
-		WriteXML.write(g, "test_init");
+		WriteXML.write(g, "non-uni_init");
 		g.solve();
-		WriteXML.write(g, "test_solved");
+		WriteXML.write(g, "non-uni_solved");
 	}
 
 }
