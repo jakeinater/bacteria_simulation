@@ -13,13 +13,13 @@ pos = dict( [(n, (xcoord, y[n])) for (n, xcoord) in x.items()] )
 
 
 fig, ax = plt.subplots()
-img = plt.imread("../../assets/non-uni-maze2-1.png")
+img = plt.imread("../../assets/non-uni-maze2-2.png")
 ax.imshow(img)
 
 nx.draw(DG, pos, with_labels=True, node_size = 100, font_size=7,
-        connectionstyle='arc3, rad = 0.1', edge_color=edge_colors, edge_cmap=plt.cm.magma, width=4)
+        connectionstyle='arc3, rad = 0.1', edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=4)
 
-cb = plt.cm.ScalarMappable(cmap=plt.cm.Blues, norm=plt.Normalize(vmin=min(edge_colors), vmax=max(edge_colors)))
+cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(vmin=min(edge_colors), vmax=max(edge_colors)))
 cb._A = []
 
 plt.colorbar(cb)
