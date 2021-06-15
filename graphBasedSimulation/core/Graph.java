@@ -164,7 +164,7 @@ public class Graph {
 		
 		//String maze = args[0];
 		String maze = "non-uni-maze.txt";
-		String path = "graphBasedSimulation/assets/" + maze;
+		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
 		//File f = new File(path);
 		Graph g = new Graph(path);
