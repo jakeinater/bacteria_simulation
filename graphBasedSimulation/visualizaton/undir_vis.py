@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-DG = nx.read_graphml('../assets/test_solved.graphml')
+DG = nx.read_graphml('../assets/graphs/marinus_uni.graphml')
 
 G = DG.to_undirected(reciprocal=True)
 for node in DG:

@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-DG = nx.read_graphml('../assets/non-uni_solved.graphml')
+DG = nx.read_graphml('../assets/graphs/ecoli_non-uni.graphml')
 
 edge_labels = dict( [ ((u,v),'%.1f' % d['weight']) for u,v,d in DG.edges(data=True)] )
 edge_colors = [ d['weight'] for u,v,d in DG.edges(data=True)]
