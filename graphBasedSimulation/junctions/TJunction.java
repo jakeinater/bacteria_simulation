@@ -13,12 +13,17 @@ public class TJunction extends Junction {
 	//probabilities, e1 = pLeft, e2 = pRight, e3 = pMiddle
 	private static TripletProbabilities<Double, Double, Double> pFromMiddle, pFromLeft, pFromRight;
 	
-	public TJunction(int ID, double x, double y, int leftID, int midID, int rightID ) {
+	public TJunction(boolean uniformProbabilities, String species, int ID, double x, double y, int leftID, int midID, int rightID ) {
 		super(ID, x, y);
 		
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/assets/probabilities/ecoli/" + "TProb-non-uni.txt";
+				String path;
+				if (uniformProbabilities) {
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "TProb-uni.txt";
+				} else {
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "TProb-non-uni.txt";
+				}
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");

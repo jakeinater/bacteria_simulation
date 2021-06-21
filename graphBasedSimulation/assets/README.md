@@ -12,22 +12,27 @@ SINK: ID SINK coordX coordY edgeID
 ```
 
 ### Probability data
-XProb:
+XProb-uni/non-uni.txt:
 coming from top (imagine +): 
 ```
 pLeft, pForward, pRight, pBack
 ```
 
-TProb:
+TProb-uni/non-uni.txt:
 ```
 Entering from middle:   pLeft, pRight, pMiddle
 Entering from left:     pLeft, pRight, pMiddle
 Entering from right:    pLeft, pRight, pMiddle
 ```
 
-YProb:
+YProb-uni/non-uni.txt:
 ```
 Entering from middle:   pLeft, pRight, pMiddle
 Entering from left:     pLeft, pRight, pMiddle
 Entering from right:    pLeft, pRight, pMiddle
+```
+
+LProb-uni/non-uni.txt
+```
+pPass, pU-turn, pStuck
 ```

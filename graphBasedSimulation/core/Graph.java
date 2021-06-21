@@ -10,6 +10,7 @@ enum Type {
 	SOURCE, Y, T, X, L, SINK 
 }
 
+
 public class Graph {
 	
 	//we have n junctions with contiguous IDs 0, 1, ... n-1. 
@@ -32,7 +33,7 @@ public class Graph {
 	Graph(){
 	}
 	
-	Graph(String file, boolean start_at_source, boolean start_at_sink) throws RuntimeException {
+	Graph(String file, boolean start_at_source, boolean start_at_sink, boolean uniformProb, String species) throws RuntimeException {
 		//TODO: move the line parsing into their respective constructors
 		this.start_at_source = start_at_source;
 		this.start_at_sink = start_at_sink;
@@ -61,7 +62,7 @@ public class Graph {
 				case T:
 					//3 neigbours: leftID baseID rightID
 					if (line.length != 7) throw new RuntimeException("there are " + line.length + "arguments while 7 are needed");
-					nodes[ID] =  new TJunction( ID,
+					nodes[ID] =  new TJunction( uniformProb, species, ID,
 							Double.parseDouble(line[2]),
 							Double.parseDouble(line[3]),
 							Integer.parseInt(line[4]), 
@@ -73,7 +74,7 @@ public class Graph {
 				case X:
 					//4 neighbours: firstID secondID thirdID fourthID
 					if (line.length != 8) throw new RuntimeException("there are " + line.length + "arguments while 8 are needed");
-					nodes[ID] = new XJunction( ID,
+					nodes[ID] = new XJunction( uniformProb, species, ID,
 							Double.parseDouble(line[2]),
 							Double.parseDouble(line[3]),
 							Integer.parseInt(line[4]),
@@ -85,7 +86,7 @@ public class Graph {
 				case L:
 					//2 neighbours: leftID rightID
 					if (line.length != 6) throw new RuntimeException("there are " + line.length + "arguments while 6 are needed");
-					nodes[ID] = new LJunction( ID,
+					nodes[ID] = new LJunction( uniformProb, species, ID,
 							Double.parseDouble(line[2]),
 							Double.parseDouble(line[3]),
 							Integer.parseInt(line[4]),
@@ -95,7 +96,7 @@ public class Graph {
 				case Y:
 					//3 neighbours: leftID baseID rightID
 					if (line.length != 7) throw new RuntimeException("there are " + line.length + "arguments while 7 are needed");
-					nodes[ID] = new YJunction( ID, 
+					nodes[ID] = new YJunction( uniformProb, species, ID, 
 							Double.parseDouble(line[2]),
 							Double.parseDouble(line[3]),
 							Integer.parseInt(line[4]), 
@@ -165,8 +166,6 @@ public class Graph {
 		double numAgents = 1000;
 		//we need to store the prev node, the number of agents entering the next node, and the next node, 
 		//while incrementing the prev node
-		//Pair<prevID, num agents>
-		//if (agents < MIN) return;
 		ArrayDeque<Triplet<Integer, Double, Integer>> q = new ArrayDeque<>();
 		Triplet<Integer, Double, Integer> cur;
 		
@@ -174,7 +173,6 @@ public class Graph {
 		if (start_at_sink) nodes[endID].passThrough(0, numAgents, q);
 		
 		while (!q.isEmpty()) {
-			//System.out.println(q.size());
 			cur = q.remove();
 			nodes[cur.e3].passThrough(cur.e1, cur.e2, q);
 		}
@@ -189,13 +187,18 @@ public class Graph {
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
-		Graph g1 = new Graph(path, true, true);
+
+		Graph g0 = new Graph(path, true, false, false, "ecoli");
+		g0.solve(); //from both ends
+		WriteXML.write(g0, "LJunction/ecoli_non-uni_start");
+
+		Graph g1 = new Graph(path, true, true, false, "ecoli");
 		g1.solve(); //from both ends
-		WriteXML.write(g1, "ecoli_non-uni_both-ends");
+		WriteXML.write(g1, "LJunction/ecoli_non-uni_both-ends");
 		
-		Graph g2 = new Graph(path, false, true);
+		Graph g2 = new Graph(path, false, true, false, "ecoli");
 		g2.solve(); //from end
-		WriteXML.write(g2, "ecoli_non-uni_end");
+		WriteXML.write(g2, "LJunction/ecoli_non-uni_end");
 		
 	}
 

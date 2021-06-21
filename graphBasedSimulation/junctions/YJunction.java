@@ -13,11 +13,16 @@ public class YJunction extends Junction {
 	//probabilities, e1 = pLeft, e2 = pRight, e3 = pMiddle
 	private static TripletProbabilities<Double, Double, Double> pFromMiddle, pFromLeft, pFromRight;
 	
-	public YJunction(int ID, double x, double y, int leftID, int midID, int rightID ) {
+	public YJunction(boolean uniformProb, String species, int ID, double x, double y, int leftID, int midID, int rightID ) {
 		super(ID, x, y);
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/assets/probabilities/ecoli/" + "YProb-non-uni.txt";
+				String path;
+				if (uniformProb) {
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "YProb.txt";
+				} else {
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "YProb.txt";
+				}
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");

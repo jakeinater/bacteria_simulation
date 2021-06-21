@@ -16,11 +16,16 @@ public class XJunction extends Junction {
 
 	private static QuartetProbabilities<Double, Double, Double, Double> p;
 	
-	public XJunction(int ID, double x, double y, int e1ID, int e2ID, int e3ID, int e4ID ) {
+	public XJunction(boolean uniformProb, String species, int ID, double x, double y, int e1ID, int e2ID, int e3ID, int e4ID ) {
 		super(ID, x, y);
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/assets/probabilities/ecoli/" + "XProb-non-uni.txt";
+				String path;
+				if (uniformProb) {
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "XProb-uni.txt";
+				} else {
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "XProb-non-uni.txt";
+				}
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");
