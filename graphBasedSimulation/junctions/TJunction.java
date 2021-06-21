@@ -18,7 +18,7 @@ public class TJunction extends Junction {
 		
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/assets/probabilities/marinus/" + "TProb-uni.txt";
+				String path = "graphBasedSimulation/assets/probabilities/ecoli/" + "TProb-non-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");

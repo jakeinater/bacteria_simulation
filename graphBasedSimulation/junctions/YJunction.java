@@ -17,7 +17,7 @@ public class YJunction extends Junction {
 		super(ID, x, y);
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/assets/probabilities/marinus/" + "YProb-uni.txt";
+				String path = "graphBasedSimulation/assets/probabilities/ecoli/" + "YProb-non-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");

@@ -25,12 +25,18 @@ public class Graph {
 	
 	private Junction[] nodes;
 	private int startID;
+	private int endID;
+	private boolean start_at_source;
+	private boolean start_at_sink;
 	
 	Graph(){
 	}
 	
-	Graph(String file) throws RuntimeException {
+	Graph(String file, boolean start_at_source, boolean start_at_sink) throws RuntimeException {
 		//TODO: move the line parsing into their respective constructors
+		this.start_at_source = start_at_source;
+		this.start_at_sink = start_at_sink;
+		
 		try {
 			Scanner f = new Scanner(new File(file));
 			Scanner count = new Scanner(new File(file));
@@ -100,19 +106,34 @@ public class Graph {
 				case SOURCE:
 					//1 neighbour: edgeID
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes[ID] = new Source( ID,
-							Double.parseDouble(line[2]),
-							Double.parseDouble(line[3]),
-							Integer.parseInt(line[4]));
+					if (start_at_source) {
+						nodes[ID] = new Source( ID,
+								Double.parseDouble(line[2]),
+								Double.parseDouble(line[3]),
+								Integer.parseInt(line[4]));
+					} else {
+						nodes[ID] = new Sink( ID,
+								Double.parseDouble(line[2]),
+								Double.parseDouble(line[3]),
+								Integer.parseInt(line[4]));
+					}
 					startID = ID;
 					break;
 				case SINK:
 					//1 neighbour: edgeID
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
-					nodes[ID] = new Sink( ID,
-							Double.parseDouble(line[2]),
-							Double.parseDouble(line[3]),
-							Integer.parseInt(line[4]));
+					if (start_at_sink) {
+						nodes[ID] = new Source( ID,
+								Double.parseDouble(line[2]),
+								Double.parseDouble(line[3]),
+								Integer.parseInt(line[4]));
+					} else {
+						nodes[ID] = new Sink( ID,
+								Double.parseDouble(line[2]),
+								Double.parseDouble(line[3]),
+								Integer.parseInt(line[4]));
+					}
+					endID = ID;
 					break;
 				default:
 					System.out.println("not defined");
@@ -149,9 +170,11 @@ public class Graph {
 		ArrayDeque<Triplet<Integer, Double, Integer>> q = new ArrayDeque<>();
 		Triplet<Integer, Double, Integer> cur;
 		
-		nodes[startID].passThrough(0, numAgents, q);
+		if (start_at_source) nodes[startID].passThrough(0, numAgents, q);
+		if (start_at_sink) nodes[endID].passThrough(0, numAgents, q);
+		
 		while (!q.isEmpty()) {
-			System.out.println(q.size());
+			//System.out.println(q.size());
 			cur = q.remove();
 			nodes[cur.e3].passThrough(cur.e1, cur.e2, q);
 		}
@@ -163,12 +186,17 @@ public class Graph {
 		// TODO Auto-generated method stub
 		
 		//String maze = args[0];
-		String maze = "uni-maze.txt";
+		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
-		Graph g = new Graph(path);
-		g.solve();
-		WriteXML.write(g, "marinus_uni");
+		Graph g1 = new Graph(path, true, true);
+		g1.solve(); //from both ends
+		WriteXML.write(g1, "ecoli_non-uni_both-ends");
+		
+		Graph g2 = new Graph(path, false, true);
+		g2.solve(); //from end
+		WriteXML.write(g2, "ecoli_non-uni_end");
+		
 	}
 
 }

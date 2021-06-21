@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-DG = nx.read_graphml('../assets/graphs/marinus_uni.graphml')
+DG = nx.read_graphml('../assets/graphs/ecoli_non-uni_both-ends.graphml')
 
 G = DG.to_undirected(reciprocal=True)
 for node in DG:
@@ -21,7 +21,7 @@ pos = dict( [(n, (xcoord, y[n])) for (n, xcoord) in x.items()] )
 
 
 fig, ax = plt.subplots()
-img = plt.imread("../../assets/uni-maze2-edges.png")
+img = plt.imread("../../assets/non-uni-maze2-2.png")
 ax.imshow(img)
 
 nx.draw(G, pos, with_labels=True, node_size = 350, node_color='black', font_color='red', font_size=7,

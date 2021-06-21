@@ -20,7 +20,7 @@ public class XJunction extends Junction {
 		super(ID, x, y);
 		if (!initialized) {
 			try {
-				String path = "graphBasedSimulation/assets/probabilities/marinus/" + "XProb-uni.txt";
+				String path = "graphBasedSimulation/assets/probabilities/ecoli/" + "XProb-non-uni.txt";
 				Scanner f = new Scanner(new File(path));
 			
 				String[] line = f.nextLine().split("\\s+");
