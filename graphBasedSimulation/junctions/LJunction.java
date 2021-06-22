@@ -49,6 +49,7 @@ public class LJunction extends Junction {
 	@Override
 	public void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q) {
 		if (numAgents < MIN) return;
+		incrementNodeWeight(numAgents);
 		
 		if (prevID == e1.getDest()) {
 			//coming from e1

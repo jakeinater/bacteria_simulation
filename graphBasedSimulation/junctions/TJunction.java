@@ -64,6 +64,7 @@ public class TJunction extends Junction {
 	@Override
 	public void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q) {
 		if (numAgents<MIN) return;
+		incrementNodeWeight(numAgents);
 	
 		if (prevID == left.getDest()) {
 			//came from left

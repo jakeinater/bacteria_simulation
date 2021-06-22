@@ -1,9 +1,12 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import sys
+from datetime import date
 
-DG = nx.read_graphml('../assets/graphs/LJunction/ecoli_non-uni_start.graphml')
+DG = nx.read_graphml('../assets/graphs/LJunction/' + str(sys.argv[1]) + '.graphml')
 
 G = DG.to_undirected(reciprocal=True)
+
 for node in DG:
     for neighbor in nx.neighbors(DG, node):
         if node in nx.neighbors(DG, neighbor):
@@ -19,21 +22,27 @@ x = nx.get_node_attributes(G, 'x')
 y = nx.get_node_attributes(G, 'y')
 pos = dict( [(n, (xcoord, y[n])) for (n, xcoord) in x.items()] )
 
+node_colors = [w for (n, w) in nx.get_node_attributes(G, 'weight').items()]
 
 fig, ax = plt.subplots()
 img = plt.imread("../../assets/non-uni-maze2-2.png")
 #img = plt.imread("../../assets/uni-maze2-edges.png")
 ax.imshow(img)
 
-nx.draw(G, pos, with_labels=False, node_size = 350, node_color='black', font_color='red', font_size=7,
-        edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=20, alpha=.8)
+nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7,
+        edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8)
 
-cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0, vmax=max(edge_colors)))
+nx.draw_networkx_nodes(G,pos, node_color=node_colors, node_size=85, alpha=1, cmap=plt.cm.inferno)
+
+cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(vmin=min(edge_colors), vmax=max(edge_colors)))
 cb._A = []
 
 plt.colorbar(cb)
 
-#nx.draw_networkx_edge_labels(G, pos, font_size=6, bbox=dict(alpha=0), font_color='white')
+if len(sys.argv) > 2 and str(sys.argv[2]) == '-l':
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=4, bbox=dict(alpha=0), font_color='white')
+    plt.savefig('../assets/figures/' + date.today().isoformat() + '_' + str(sys.argv[1]) + '_labelled.tif', dpi=300)
+else:
+    plt.savefig('../assets/figures/' + date.today().isoformat() + '_' + str(sys.argv[1]) + '.tif', dpi=300)
 
-
-plt.show()
+#plt.show()

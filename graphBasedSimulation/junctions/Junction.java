@@ -9,6 +9,7 @@ public abstract class Junction {
 	private int junctionID;
 	private double x, y;
 	static final double MIN = 1;
+	private double weight = 0;
 	
 	public Junction(int ID, double x, double y) {
 		junctionID = ID;
@@ -21,9 +22,17 @@ public abstract class Junction {
 	}
 
 	//
+	public void incrementNodeWeight(double inc) {
+		weight += inc;
+	}
+	
+	public double getNodeWeight() {
+		return weight;
+	}
+	
 	public abstract void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q);
 	
-		public double getX() {
+	public double getX() {
 		return x;
 	}
 	

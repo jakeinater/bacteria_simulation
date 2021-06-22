@@ -54,6 +54,7 @@ public class XJunction extends Junction {
 	@Override
 	public void passThrough(int prevID, double numAgents, ArrayDeque<Triplet<Integer, Double, Integer>> q) {
 		if (numAgents<MIN) return; //below threshold
+		incrementNodeWeight(numAgents);
 		
 		if (prevID == e1.getDest()) {
 			//from e1

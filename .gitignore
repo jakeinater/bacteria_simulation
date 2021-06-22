@@ -10,3 +10,4 @@ videos
 /out/core/
 /out/
 env/
+*.tif

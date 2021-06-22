@@ -45,6 +45,15 @@ public class WriteXML {
 			key1.setAttribute("attr.name", "weight");
 			key1.setAttribute("attr.type", "double");
 
+			//node weight
+			Element key0 = doc.createElement("key");
+			rootElement.appendChild(key0);
+			
+			key0.setAttribute("id", "d3");
+			key0.setAttribute("for", "node");
+			key0.setAttribute("attr.name", "weight");
+			key0.setAttribute("attr.type", "double");
+
 			//Y
 			Element key2 = doc.createElement("key");
 			rootElement.appendChild(key2);
@@ -80,6 +89,11 @@ public class WriteXML {
 				graph.appendChild(node);
 				node.setAttribute("id", Integer.toString(cur.getID()));
 				
+				Element Weight = doc.createElement("data");
+				node.appendChild(Weight);
+				Weight.setAttribute("key", "d3");
+				Weight.appendChild(doc.createTextNode(Double.toString(cur.getNodeWeight())));
+
 				Element dataX = doc.createElement("data");
 				Element dataY = doc.createElement("data");
 				node.appendChild(dataX);
