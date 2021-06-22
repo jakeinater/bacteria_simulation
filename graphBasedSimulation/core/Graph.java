@@ -183,7 +183,7 @@ public class Graph {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		//String maze = args[0];
+		/*
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
@@ -199,7 +199,24 @@ public class Graph {
 		Graph g2 = new Graph(path, false, true, false, "ecoli");
 		g2.solve(); //from end
 		WriteXML.write(g2, "LJunction/ecoli_non-uni_end");
+		*/
+	
+		String maze = "uni-maze.txt";
+		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
+		System.out.println(path);
+
+		Graph g0 = new Graph(path, true, false, false, "ecoli");
+		g0.solve(); //from both ends
+		WriteXML.write(g0, "LJunction/ecoli_uni_start");
+
+		Graph g1 = new Graph(path, true, true, false, "ecoli");
+		g1.solve(); //from both ends
+		WriteXML.write(g1, "LJunction/ecoli_uni_both-ends");
 		
+		Graph g2 = new Graph(path, false, true, false, "ecoli");
+		g2.solve(); //from end
+		WriteXML.write(g2, "LJunction/ecoli_uni_end");
+
 	}
 
 }

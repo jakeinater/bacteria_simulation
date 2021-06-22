@@ -19,9 +19,9 @@ public class YJunction extends Junction {
 			try {
 				String path;
 				if (uniformProb) {
-					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "YProb.txt";
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/YProb-uni.txt";
 				} else {
-					path = "graphBasedSimulation/assets/probabilities/" + species + "/" + "YProb.txt";
+					path = "graphBasedSimulation/assets/probabilities/" + species + "/YProb-uni.txt";
 				}
 				Scanner f = new Scanner(new File(path));
 			
