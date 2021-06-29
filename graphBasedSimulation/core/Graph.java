@@ -182,7 +182,7 @@ public class Graph {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String species = "marinus";
+		String species = "putida";
 		
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
