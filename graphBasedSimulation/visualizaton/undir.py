@@ -5,6 +5,7 @@ import getopt
 from datetime import date
 
 #undir <filename> -l(labelled) -n(non-uniform)
+#options
 opts, args = getopt.getopt(sys.argv[1:], "ln")
 
 iofile = ''
@@ -18,13 +19,14 @@ for opt in args:
     elif opt == "-n":
         uniform = False
 
-print("labelled:" + str(labelled))
-print("uniform:" + str(uniform))
 
+#reading graphML file
 DG = nx.read_graphml('../assets/graphs/LJunction/' + iofile + '.graphml')
 
+#convert to undirected graph
 G = DG.to_undirected(reciprocal=True)
 
+#setting the undir edge weighting from dir graph
 for node in DG:
     for neighbor in nx.neighbors(DG, node):
         if node in nx.neighbors(DG, neighbor):
@@ -32,6 +34,7 @@ for node in DG:
                     DG.edges[node, neighbor]['weight'] + DG.edges[neighbor, node]['weight']
                     )
 
+#edge and node attributes
 edge_labels = dict( [ ((u,v),'%.1f' % d['weight']) for u,v,d in G.edges(data=True)] )
 edge_colors = [ d['weight'] for v,n,d in G.edges(data=True)]
 
@@ -42,6 +45,8 @@ pos = dict( [(n, (xcoord, y[n])) for (n, xcoord) in x.items()] )
 
 node_colors = [w for (n, w) in nx.get_node_attributes(G, 'weight').items()]
 
+
+#background image
 fig, ax = plt.subplots()
 
 if uniform:
@@ -51,15 +56,25 @@ else:
 
 ax.imshow(img)
 
+
+#drawing the graph
+VMAX = 4000
+#VMIN=min(edge_colors),VMAX=max(edge_colors)
+
 nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7,
-        edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8, edge_vmin=0, edge_vmax=2000)
+        edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8, edge_vmin=0, edge_vmax=VMAX)
 
-nx.draw_networkx_nodes(G,pos, node_color=node_colors, node_size=85, alpha=1, cmap=plt.cm.inferno, vmin=0, vmax=2000)
+nx.draw_networkx_nodes(G,pos, node_color=node_colors, node_size=85, alpha=1, cmap=plt.cm.inferno, vmin=0, vmax=VMAX)
 
-cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0, 2000))#vmin=min(edge_colors), vmax=max(edge_colors)))
+
+#color bar
+cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0,VMAX))
 cb._A = []
 
 plt.colorbar(cb)
+
+
+#drawing and saving figure
 if uniform:
     if labelled:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=4, 
