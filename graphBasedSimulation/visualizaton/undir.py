@@ -58,7 +58,7 @@ ax.imshow(img)
 
 
 #drawing the graph
-VMAX = 4000
+VMAX = 2000
 #VMIN=min(edge_colors),VMAX=max(edge_colors)
 
 nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7,
