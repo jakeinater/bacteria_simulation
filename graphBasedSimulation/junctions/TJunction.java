@@ -100,5 +100,38 @@ public class TJunction extends Junction {
 		addEdgeXML(doc, graphElement, d2, mid);	
 		addEdgeXML(doc, graphElement, d2, right);	
 	}
+	
+	
+	public static TripletProbabilities<Double, Double, Double> getCopyPFromLeft() {
+		return new TripletProbabilities<>(pFromLeft.pLeft, pFromLeft.pRight, pFromLeft.pMiddle);
+	}
+	
+	public static void setPFromLeft(Double left, Double right, Double middle) {
+		pFromLeft.pLeft = left;
+		pFromLeft.pRight = right;
+		pFromLeft.pMiddle = middle;
+	}
+
+	public static TripletProbabilities<Double, Double, Double> getCopyPFromRight() {
+		return new TripletProbabilities<>(pFromRight.pLeft, pFromRight.pRight, pFromRight.pMiddle);
+	}
+	
+	public static void setPFromRight(Double left, Double right, Double middle) {
+		pFromRight.pLeft = left;
+		pFromRight.pRight = right;
+		pFromRight.pMiddle = middle;
+	}
+
+	public static TripletProbabilities<Double, Double, Double> getCopyPFromMiddle() {
+		return new TripletProbabilities<>(pFromMiddle.pLeft, pFromMiddle.pRight, pFromMiddle.pMiddle);
+	}
+	
+	public static void setPFromMiddle(Double left, Double right, Double middle) {
+		pFromMiddle.pLeft = left;
+		pFromMiddle.pRight = right;
+		pFromMiddle.pMiddle = middle;
+	}
+
+
 
 }

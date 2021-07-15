@@ -71,5 +71,15 @@ public class LJunction extends Junction {
 		addEdgeXML(doc, graphElement, d2, e1);
 		addEdgeXML(doc, graphElement, d2, e2);
 	}
+	
+	public static Triplet<Double, Double, Double> getCopyProbabilities() {
+		return new Triplet<>(p.e1, p.e2, p.e3);
+	}
+	
+	public static void setProbabilities(Double e1, Double e2, Double e3) {
+		p.e1 = e1;
+		p.e2 = e2;
+		p.e3 = e3;
+	}
 
 }
