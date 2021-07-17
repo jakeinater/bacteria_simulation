@@ -3,10 +3,7 @@ import java.io.*;
 import java.util.*;
 
 import junctions.*;
-import utils.Quartet;
-import utils.QuartetProbabilities;
-import utils.Triplet;
-import utils.TripletProbabilities;
+import utils.*;
 import io.xml.WriteXML;
 
 enum Type {
@@ -32,6 +29,13 @@ public class Graph {
 	private int endID;
 	private boolean start_at_source;
 	private boolean start_at_sink;
+	private int numNodes;
+	private int numDirEdges = 0;
+	
+	private boolean graded = false;
+	private boolean wasMean = false;
+	private HashMap<String, Double> loss = null;
+	private HashMap<String, Double> expHeatmap = null;
 	
 	Graph(){
 	}
@@ -51,6 +55,7 @@ public class Graph {
 				count.nextLine();
 			}
 			
+			numNodes = i;
 			this.nodes = new Junction[i];
 
 			String[] line;
@@ -64,6 +69,7 @@ public class Graph {
 				switch (Type.valueOf(line[1])) {
 				case T:
 					//3 neigbours: leftID baseID rightID
+					numDirEdges += 3;
 					if (line.length != 7) throw new RuntimeException("there are " + line.length + "arguments while 7 are needed");
 					nodes[ID] =  new TJunction( uniformProb, species, ID,
 							Double.parseDouble(line[2]),
@@ -76,6 +82,7 @@ public class Graph {
 				
 				case X:
 					//4 neighbours: firstID secondID thirdID fourthID
+					numDirEdges += 4;
 					if (line.length != 8) throw new RuntimeException("there are " + line.length + "arguments while 8 are needed");
 					nodes[ID] = new XJunction( uniformProb, species, ID,
 							Double.parseDouble(line[2]),
@@ -88,6 +95,7 @@ public class Graph {
 					break;
 				case L:
 					//2 neighbours: leftID rightID
+					numDirEdges += 2;
 					if (line.length != 6) throw new RuntimeException("there are " + line.length + "arguments while 6 are needed");
 					nodes[ID] = new LJunction( uniformProb, species, ID,
 							Double.parseDouble(line[2]),
@@ -98,6 +106,7 @@ public class Graph {
 					break;
 				case Y:
 					//3 neighbours: leftID baseID rightID
+					numDirEdges += 3;
 					if (line.length != 7) throw new RuntimeException("there are " + line.length + "arguments while 7 are needed");
 					nodes[ID] = new YJunction( uniformProb, species, ID, 
 							Double.parseDouble(line[2]),
@@ -109,6 +118,7 @@ public class Graph {
 					break;
 				case SOURCE:
 					//1 neighbour: edgeID
+					numDirEdges += 1;
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
 					if (start_at_source) {
 						nodes[ID] = new Source( ID,
@@ -125,6 +135,7 @@ public class Graph {
 					break;
 				case SINK:
 					//1 neighbour: edgeID
+					numDirEdges += 1;
 					if (line.length != 5) throw new RuntimeException("there are " + line.length + "arguments while 5 are needed");
 					if (start_at_sink) {
 						nodes[ID] = new Source( ID,
@@ -183,11 +194,58 @@ public class Graph {
 		System.out.println("done!");
 	}
 	
-	public double grade() {
+	public double grade(boolean mean) {
 		//helper function for sweep method
 
 		//only applicable to undirected graphs
 		//convert to undirected graph -> grade -> return grade?
+		if ( mean ^ wasMean || !graded ) {
+			graded = true;
+			//need to initialize the hashmap
+			loss = new HashMap<>(numDirEdges/2);
+			for (Junction node: this.nodes) {
+				node.addUndirEdges(loss);
+			}
+			
+			//parse through the asset file and create the map using that.
+			try {
+				String file = "non-uni-EC.txt";
+				String path = "graphBasedSimulation/assets/exp_heatmaps/" + file;
+				Scanner f = new Scanner(new File(path));
+			
+				String[] line;
+				String key;
+				
+				expHeatmap = new HashMap<>(numDirEdges/2);
+				
+				if (mean) {
+					wasMean = true;
+					while (f.hasNext()) {
+						line = f.nextLine().split("\\s+");
+						key = StringKey.stringKey(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
+						expHeatmap.put(key, Double.parseDouble(line[3]));
+					}
+				} else {
+					wasMean = false;
+					while (f.hasNext()) {
+						line = f.nextLine().split("\\s+");
+						key = StringKey.stringKey(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
+						expHeatmap.put(key, Double.parseDouble(line[5]));
+					}
+				}
+			} catch (FileNotFoundException e) {
+				System.out.println("file not found");
+				System.exit(1);
+			} catch (IllegalArgumentException e) {
+				System.out.println("formatting error with file");
+				e.printStackTrace();
+				System.exit(1);
+			}
+			
+			System.out.println(loss.size());
+			System.out.println(expHeatmap.size());
+		}
+		
 		return 0.;
 	}
 	
@@ -335,7 +393,7 @@ public class Graph {
 																{
 																	//grade and stuff
 																	this.solve();
-																	curScore = this.grade();
+																	curScore = this.grade(true);
 																	if (curScore < prevScore) {
 																		//store the values
 																		for (int i = 0; i < prob2.length; i++) {

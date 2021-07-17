@@ -2,10 +2,8 @@ import core.Graph;
 import io.xml.*;
 
 public class Main {
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		String species = "natriegens";
+	
+	private static void generateGraphs(String species) {
 
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
@@ -39,5 +37,21 @@ public class Main {
 		g5.solve(); //from end
 		WriteXML.write(g5, "LJunction/" + species + "_uni_end");
 
+
+	}
+	
+	private static void test() {
+		String maze = "non-uni-maze.txt";
+		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
+		System.out.println(path);
+
+		Graph g0 = new Graph(path, true, false, false, "ecoli");
+		g0.grade(true);
+		
+	}
+	
+
+	public static void main(String[] args) {
+		test();
 	}	
 }

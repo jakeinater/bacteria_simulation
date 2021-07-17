@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayDeque;
 import java.util.Scanner;
+import java.util.HashMap;
 
 import utils.Triplet;
+import utils.StringKey;
 import org.w3c.dom.*;
 
 public class LJunction extends Junction {
@@ -80,6 +82,17 @@ public class LJunction extends Junction {
 		p.e1 = e1;
 		p.e2 = e2;
 		p.e3 = e3;
+	}
+	
+	@Override
+	public void addUndirEdges(HashMap<String, Double> loss) {
+		String key = StringKey.stringKey(this.getID(), this.e1.getDest());
+		double weight = loss.getOrDefault(key, 0.) + e1.getWeight();
+		loss.put(key, weight);
+	
+		key = StringKey.stringKey(this.getID(), this.e2.getDest());
+		weight = loss.getOrDefault(key, 0.) + e2.getWeight();
+		loss.put(key, weight);
 	}
 
 }

@@ -127,6 +127,20 @@ public class YJunction extends Junction {
 		pFromMiddle.pRight = right;
 		pFromMiddle.pMiddle = middle;
 	}
-
+	
+	@Override
+	public void addUndirEdges(HashMap<String, Double> loss) {
+		String key = StringKey.stringKey(this.getID(), this.left.getDest());
+		double weight = loss.getOrDefault(key, 0.) + left.getWeight();
+		loss.put(key, weight);
+	
+		key = StringKey.stringKey(this.getID(), this.mid.getDest());
+		weight = loss.getOrDefault(key, 0.) + mid.getWeight();
+		loss.put(key, weight);
+		
+		key = StringKey.stringKey(this.getID(), this.right.getDest());
+		weight = loss.getOrDefault(key, 0.) + right.getWeight();
+		loss.put(key, weight);
+	}
 
 }

@@ -1,6 +1,8 @@
 package junctions;
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import utils.Triplet;
+import utils.UndirEdge;
 import core.DirEdge;
 import org.w3c.dom.*;
 
@@ -55,5 +57,10 @@ public abstract class Junction {
 		data.setAttribute("key", d2);
 		data.appendChild(doc.createTextNode(Double.toString(e.getWeight())));
 	}
+	
+	
+	
+	//take a hashmap and add the junctions edge weights to the map with a string of nodeIDs as keys, smaller ID first
+	public abstract void addUndirEdges(HashMap<String, Double> loss);
 	
 }

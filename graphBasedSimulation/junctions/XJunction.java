@@ -3,10 +3,12 @@ package junctions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.HashMap;
 import java.util.ArrayDeque;
 import org.w3c.dom.*;
 
 import utils.Triplet;
+import utils.StringKey;
 import core.DirEdge;
 import utils.QuartetProbabilities;
 
@@ -106,5 +108,25 @@ public class XJunction extends Junction {
 		addEdgeXML(doc, graphElement, d2, e3);		
 		addEdgeXML(doc, graphElement, d2, e4);		
 	}
+
+	@Override
+	public void addUndirEdges(HashMap<String, Double> loss) {
+		String key = StringKey.stringKey(this.getID(), this.e1.getDest());
+		double weight = loss.getOrDefault(key, 0.) + e1.getWeight();
+		loss.put(key, weight);
+	
+		key = StringKey.stringKey(this.getID(), this.e2.getDest());
+		weight = loss.getOrDefault(key, 0.) + e2.getWeight();
+		loss.put(key, weight);
+			
+		key = StringKey.stringKey(this.getID(), this.e3.getDest());
+		weight = loss.getOrDefault(key, 0.) + e3.getWeight();
+		loss.put(key, weight);
+
+		key = StringKey.stringKey(this.getID(), this.e4.getDest());
+		weight = loss.getOrDefault(key, 0.) + e4.getWeight();
+		loss.put(key, weight);
+	}
+	
 
 }

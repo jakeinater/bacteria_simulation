@@ -1,7 +1,10 @@
 package junctions;
 import core.DirEdge;
 import java.util.ArrayDeque;
+import java.util.HashMap;
+
 import utils.Triplet;
+import utils.StringKey;
 import org.w3c.dom.*;
 
 public class Source extends Junction {
@@ -23,6 +26,13 @@ public class Source extends Junction {
 	@Override
 	public void addEdgesXML(Document doc, Element graphElement, String d2) {
 		addEdgeXML(doc, graphElement, d2, next);
+	}
+	
+	@Override
+	public void addUndirEdges(HashMap<String, Double> loss) {
+		String key = StringKey.stringKey(this.getID(), this.next.getDest());
+		double weight = loss.getOrDefault(key, 0.) + next.getWeight();
+		loss.put(key, weight);
 	}
 
 }
