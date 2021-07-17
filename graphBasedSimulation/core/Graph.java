@@ -36,6 +36,7 @@ public class Graph {
 	private boolean wasMean = false;
 	private HashMap<String, Double> loss = null;
 	private HashMap<String, Double> expHeatmap = null;
+	private double maxExpWeight = 0;
 	
 	Graph(){
 	}
@@ -193,12 +194,15 @@ public class Graph {
 		
 		System.out.println("done!");
 	}
+
 	
-	public double grade(boolean mean) {
+	public double grade(boolean mean, boolean storeGraph) {
 		//helper function for sweep method
 
 		//only applicable to undirected graphs
 		//convert to undirected graph -> grade -> return grade?
+		Double sumLoss = 0.;
+		
 		if ( mean ^ wasMean || !graded ) {
 			graded = true;
 			//need to initialize the hashmap
@@ -215,6 +219,7 @@ public class Graph {
 			
 				String[] line;
 				String key;
+				double cur;
 				
 				expHeatmap = new HashMap<>(numDirEdges/2);
 				
@@ -222,15 +227,19 @@ public class Graph {
 					wasMean = true;
 					while (f.hasNext()) {
 						line = f.nextLine().split("\\s+");
-						key = StringKey.stringKey(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-						expHeatmap.put(key, Double.parseDouble(line[3]));
+						key = StringKey.stringKey(Integer.parseInt(line[1]), Integer.parseInt(line[2]));
+						cur = Double.parseDouble(line[3]);
+						if (cur > maxExpWeight) maxExpWeight = cur;
+						expHeatmap.put(key, cur);
 					}
 				} else {
 					wasMean = false;
 					while (f.hasNext()) {
 						line = f.nextLine().split("\\s+");
-						key = StringKey.stringKey(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-						expHeatmap.put(key, Double.parseDouble(line[5]));
+						key = StringKey.stringKey(Integer.parseInt(line[1]), Integer.parseInt(line[2]));
+						cur = Double.parseDouble(line[5]);
+						if (cur > maxExpWeight) maxExpWeight = cur;
+						expHeatmap.put(key, cur);
 					}
 				}
 			} catch (FileNotFoundException e) {
@@ -241,12 +250,50 @@ public class Graph {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			
-			System.out.println(loss.size());
-			System.out.println(expHeatmap.size());
 		}
+	
+		//if each edge had max possible difference
+		System.out.println("sqrt( 255^2 * num edges ): " + Math.sqrt(255*255*expHeatmap.size()));
+		System.out.println("255*num edges: " + 255*expHeatmap.size());
 		
-		return 0.;
+		//if each edge was 50% saturated (ie random edge values)
+		Double sum = 0.;
+		for (Double val: expHeatmap.values()) {
+			sum += Math.pow(255./2 - val, 2);
+			}
+		System.out.println("50%: " + Math.sqrt(sum));
+		
+		//create map
+		for (Junction node: this.nodes) {
+			node.addUndirEdges(loss);
+			}
+		
+		//normalize sim heatmap max weight to the same as max experimental
+		double maxSimWeight = 0;
+		for (double cur: loss.values()) {
+			if (cur > maxSimWeight) {
+				maxSimWeight = cur;
+				}
+			}
+		final double m = maxSimWeight == 0?1:maxSimWeight;
+		loss.replaceAll((key, val) -> val * (maxExpWeight/m));
+		
+		
+		//add up loss
+		Double val;
+		for (String key: loss.keySet()) {
+			val = Math.pow(loss.get(key) - expHeatmap.get(key), 2);
+			sumLoss += val;
+			loss.put(key, val);
+			}
+		
+		System.out.println(Math.sqrt(sumLoss));
+		
+		
+		//reset to 0
+		loss.replaceAll((key, value) -> 0.);
+		System.out.println("##############");
+		return sumLoss;
 	}
 	
 	//loop iter: if grade better store probabilities and continue, else continue. At end return the final stored probabilities.
@@ -393,7 +440,7 @@ public class Graph {
 																{
 																	//grade and stuff
 																	this.solve();
-																	curScore = this.grade(true);
+																	curScore = this.grade(true, false);
 																	if (curScore < prevScore) {
 																		//store the values
 																		for (int i = 0; i < prob2.length; i++) {
@@ -444,5 +491,7 @@ public class Graph {
 		return prob2;
 		//done iterating over all parameters: return/export best probabilties and resolve->export the graph?
 	}
+	
+	
 
 }

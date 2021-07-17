@@ -46,7 +46,12 @@ public class Main {
 		System.out.println(path);
 
 		Graph g0 = new Graph(path, true, false, false, "ecoli");
-		g0.grade(true);
+		g0.grade(true, false);
+		
+		g0.solve();
+		
+		g0.grade(true, false);
+		
 		
 	}
 	
