@@ -38,6 +38,7 @@ public class Graph {
 	private HashMap<String, Double> expHeatmap = null;
 	private double maxExpWeight = 0;
 	
+	
 	Graph(){
 	}
 	
@@ -196,7 +197,7 @@ public class Graph {
 	}
 
 	
-	public double grade(boolean mean, boolean storeGraph) {
+	public double grade(boolean mean, boolean storeGraphDiff) {
 		//helper function for sweep method
 
 		//only applicable to undirected graphs
@@ -242,13 +243,19 @@ public class Graph {
 						expHeatmap.put(key, cur);
 					}
 				}
-			} catch (FileNotFoundException e) {
+			} 
+			catch (FileNotFoundException e) {
 				System.out.println("file not found");
 				System.exit(1);
 			} catch (IllegalArgumentException e) {
 				System.out.println("formatting error with file");
 				e.printStackTrace();
 				System.exit(1);
+			}
+			
+			//store experimental measurements to view what it looks like
+			if (storeGraphDiff) {
+				WriteXML.writeUndir(this, expHeatmap, "MEAN_SUM_Result_of_05_03_18__motility_k12_maize_20x__exp_1-2");
 			}
 		}
 	
@@ -288,6 +295,13 @@ public class Graph {
 			}
 		
 		System.out.println(Math.sqrt(sumLoss));
+	
+		//export graphml of difference
+		if (storeGraphDiff) {
+			//the node IDs must be the same as the ones used in exp heatmap file.
+			String filename = "graphDiffTest";
+			WriteXML.writeUndir(this, loss, filename);
+		}
 		
 		
 		//reset to 0
@@ -491,7 +505,6 @@ public class Graph {
 		return prob2;
 		//done iterating over all parameters: return/export best probabilties and resolve->export the graph?
 	}
-	
 	
 
 }

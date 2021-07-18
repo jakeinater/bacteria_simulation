@@ -45,12 +45,12 @@ public class Main {
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
 
-		Graph g0 = new Graph(path, true, false, false, "ecoli");
-		g0.grade(true, false);
+		Graph g0 = new Graph(path, true, true, false, "ecoli");
+		g0.grade(true, true);
 		
 		g0.solve();
 		
-		g0.grade(true, false);
+		g0.grade(true, true);
 		
 		
 	}
