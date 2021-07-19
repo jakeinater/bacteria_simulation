@@ -5,7 +5,7 @@ import getopt
 from datetime import date
 from pathlib import Path
 
-#undir <filename> -l(labelled) -n(non-uniform) -i(inverted+Reds CB)
+#undir <filename> -l(labelled) -n(non-uniform) -i(inverted+Greens CB)
 #options
 opts, args = getopt.getopt(sys.argv[1:], "lni")
 
@@ -29,7 +29,7 @@ G = nx.read_graphml('../assets/graphs/' + iofile + '.graphml')
 
 #edge and node attributes
 edge_labels = dict( [ ((u,v),'%.1f' % d['weight']) for u,v,d in G.edges(data=True)] )
-edge_colors = [ d['weight'] for v,n,d in G.edges(data=True)]
+edge_colors = [ -d['weight'] for v,n,d in G.edges(data=True)]
 
 # parse the x and y attributes and create a node:coord dict
 x = nx.get_node_attributes(G, 'x')
@@ -54,24 +54,24 @@ ax.imshow(img)
 
 #drawing the graph
 #VMAX = 2000
-#VMIN=min(edge_colors)
+VMIN=min(edge_colors)
 VMAX=max(edge_colors)
 
 if inverted:
     nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7, 
-            edge_color=edge_colors, edge_cmap=plt.cm.Reds, width=9, alpha=.8, edge_vmin=0, edge_vmax=VMAX)
+            edge_color=edge_colors, edge_cmap=plt.cm.Greens, width=9, alpha=.8, edge_vmin=VMIN, edge_vmax=VMAX)
 else:
     nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7, 
-            edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8, edge_vmin=0, edge_vmax=VMAX)
+            edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8, edge_vmin=VMIN, edge_vmax=VMAX)
 
-nx.draw_networkx_nodes(G,pos, node_color=node_colors, node_size=85, alpha=1, cmap=plt.cm.inferno, vmin=0, vmax=VMAX)
+nx.draw_networkx_nodes(G,pos, node_color=node_colors, node_size=85, alpha=1, cmap=plt.cm.inferno, vmin=VMIN, vmax=VMAX)
 
 
 #color bar
 if inverted:
-    cb = plt.cm.ScalarMappable(cmap=plt.cm.Reds, norm=plt.Normalize(0,VMAX))
+    cb = plt.cm.ScalarMappable(cmap=plt.cm.Greens, norm=plt.Normalize(VMIN,VMAX))
 else:
-    cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0,VMAX))
+    cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(VMIN,VMAX))
 cb._A = []
 
 plt.colorbar(cb)
