@@ -11,3 +11,5 @@ videos
 /out/
 env/
 *.tif
+*.graphml
+

@@ -23,6 +23,7 @@ for opt in args:
 
 #reading graphML file
 DG = nx.read_graphml('../assets/graphs/LJunction/' + iofile + '.graphml')
+#DG = nx.read_graphml('../assets/graphs/' + iofile + '.graphml')
 
 #convert to undirected graph
 G = DG.to_undirected(reciprocal=True)
@@ -60,13 +61,13 @@ ax.imshow(img)
 
 #drawing the graph
 VMAX = 2000
-#VMIN=min(edge_colors),VMAX=max(edge_colors)
+#VMIN=min(edge_colors)
+#VMAX=max(edge_colors)
 
 nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7,
         edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8, edge_vmin=0, edge_vmax=VMAX)
 
-nx.draw_networkx_nodes(G,pos, node_color=node_colors, node_size=85, alpha=1, cmap=plt.cm.inferno, vmin=0, vmax=VMAX)
-
+nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=80, alpha=1, cmap=plt.cm.inferno, vmin=0, vmax=VMAX, node_shape='s')
 
 #color bar
 cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0,VMAX))
@@ -96,7 +97,8 @@ else:
                 + iofile + '_labelled.tif', dpi=300)
     else:
         Path('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
-        plt.savefig('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat() + '/' 
+        plt.savefig('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat() + '/'
                 + iofile + '.tif', dpi=300)
+
 
 #plt.show()

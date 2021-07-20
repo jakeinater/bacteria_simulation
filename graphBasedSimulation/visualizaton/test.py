@@ -85,21 +85,21 @@ if uniform:
                 bbox=dict(alpha=0), font_color='white')
         Path('D:/SURE/Figures/uni-maze/labelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
         plt.savefig('D:/SURE/Figures/uni-maze/labelled/' + date.today().isoformat() + '/' 
-                + iofile + '_labelled.tif', dpi=300)
+                + iofile + '_labelled_2.tif', dpi=300)
     else:
         Path('D:/SURE/Figures/uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
         plt.savefig('D:/SURE/Figures/uni-maze/unlabelled/' + date.today().isoformat() + '/' 
-                + iofile + '.tif', dpi=300)
+                + iofile + '_2.tif', dpi=300)
 else:
     if labelled:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=4, 
                 bbox=dict(alpha=0), font_color='white')
         Path('D:/SURE/Figures/non-uni-maze/labelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
         plt.savefig('D:/SURE/Figures/non-uni-maze/labelled/' + date.today().isoformat() + '/' 
-                + iofile + '_labelled.tif', dpi=300)
+                + iofile + '_labelled_2.tif', dpi=300)
     else:
         Path('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
         plt.savefig('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat() + '/' 
-                + iofile + '.tif', dpi=300)
+                + iofile + '_2.tif', dpi=300)
 
 #plt.show()
