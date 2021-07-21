@@ -194,7 +194,6 @@ public class Graph {
 			cur = q.remove();
 			nodes[cur.e3].passThrough(cur.e1, cur.e2, q);
 		}
-		
 		//System.out.println("done!");
 	}
 
@@ -257,7 +256,7 @@ public class Graph {
 			
 			//store experimental measurements to view what it looks like
 			if (storeGraphDiff) {
-				WriteXML.writeUndir(this, expHeatmap, "MEAN_SUM_Result_of_05_03_18__motility_k12_maize_20x__exp_1-2");
+				WriteXML.writeUndir(this, expHeatmap, "exp_representation_mean", "graphBasedSimulation/assets/graphs/testing/");
 			}
 		}
 	
@@ -301,8 +300,7 @@ public class Graph {
 		//export graphml of difference
 		if (storeGraphDiff) {
 			//the node IDs must be the same as the ones used in exp heatmap file.
-			String filename = "optimizedDiff";
-			WriteXML.writeUndir(this, loss, filename);
+			WriteXML.writeUndir(this, loss, "optimizedDiff", "graphBasedSimulation/assets/graphs/testing/");
 		}
 		
 		
@@ -323,12 +321,14 @@ public class Graph {
 		final double DEG_INCR = Math.PI*2/NUM_POINTS_ON_CIRC;
 		final double RADII_INCR = DIST_FROM_EXP/NUM_DISTANCES_FROM_EXP; 
 		
-		double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 7); //7 layers of 10*10 nested operations. 100**7 operations
-		System.out.println("Estimated time of calc assuming 7000 operations/second: " + estLengthOfOp /(7000*60*60) + "hrs");
 
 		if (uniform) {
-			TripletProbabilities<Double, Double, Double> pTFromMiddle0, pTFromLeft0, pTFromRight0, pYFromMiddle0, pYFromLeft0, pYFromRight0;
+			//uniform maze, has Y junctions
 			
+			double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 7); //7 layers of 10*10 nested operations. 100**7 operations
+			System.out.println("Estimated time of calc assuming 7000 operations/second: " + estLengthOfOp /(7000*60*60) + "hrs");
+
+			TripletProbabilities<Double, Double, Double> pTFromMiddle0, pTFromLeft0, pTFromRight0, pYFromMiddle0, pYFromLeft0, pYFromRight0;
 			
 			Triplet<Double, Double, Double> pL0 = LJunction.getCopyProbabilities();
 			
@@ -342,19 +342,6 @@ public class Graph {
 			
 			Triplet<Double, Double, Double> n1 = new Triplet<>(-1/Math.sqrt(2), 0., 1/Math.sqrt(2));
 			Triplet<Double, Double, Double> n2 = new Triplet<>(1/Math.sqrt(6), -2/Math.sqrt(6), 1/Math.sqrt(2));
-			
-			/*	
-			 * 		Quartet<
-			 * 		Triplet<Double, Double, Double>,
-			 * 		Triplet<TripletProbabilities<Double, Double, Double>,TripletProbabilities<Double, Double, Double>,TripletProbabilities<Double, Double, Double>>,
-			 * 		Triplet<TripletProbabilities<Double, Double, Double>,TripletProbabilities<Double, Double, Double>,TripletProbabilities<Double, Double, Double>>,
-			 * 		QuartetProbabilities<Double, Double, Double, Double>
-			 * 		> prevBestProbabilities = new Quartet<>(
-			 * 				new Triplet<>(0., 0., 0.), 
-			 * 				new Triplet<>(new TripletProbabilities<>(0., 0., 0.), new TripletProbabilities<>(0., 0., 0.), new TripletProbabilities<>(0., 0., 0.)), 
-			 * 				new Triplet<>(new TripletProbabilities<>(0., 0., 0.), new TripletProbabilities<>(0., 0., 0.), new TripletProbabilities<>(0., 0., 0.)), 
-			 * 				null);
-			 * */		
 			
 			double prevScore = Double.MAX_VALUE;
 			double curScore;
@@ -380,10 +367,14 @@ public class Graph {
 			//sweeping all parameters, order 10^10 time complexity
 			for (double tULeft = 0; tULeft < DIST_FROM_EXP;) {
 				for (double tVLeft = 0; tVLeft <2*Math.PI;) {
+					if (tULeft == 0.) tVLeft += 2*Math.PI;		//this is so the center, exp val, is only checked once
 					prob2[0] = pTFromLeft0.pLeft + tULeft*(n1.e1*Math.cos(tVLeft) + n2.e1*Math.sin(tVLeft));
 					prob2[1] = pTFromLeft0.pRight + tULeft*(n1.e2*Math.cos(tVLeft) + n2.e2*Math.sin(tVLeft));
 					prob2[2] = pTFromLeft0.pMiddle + tULeft*(n1.e3*Math.cos(tVLeft) + n2.e3*Math.sin(tVLeft));
-					if (prob2[0] > 1 || prob2[1] > 1 || prob2[2] > 1) continue;
+					if (prob2[0] > 1 || prob2[1] > 1 || prob2[2] > 1 || prob2[0] < 0 || prob2[1] < 0 || prob2[2] < 0) {
+						tVLeft += DEG_INCR;
+						continue;
+						}
 					TJunction.setPFromLeft(
 							prob2[0],
 							prob2[1],
@@ -392,10 +383,14 @@ public class Graph {
 					
 					for (double tURight = 0; tURight < DIST_FROM_EXP;) {
 						for (double tVRight = 0; tVRight <2*Math.PI;) {
+							if (tURight == 0.) tVRight += 2*Math.PI;
 							prob2[3] = pTFromRight0.pLeft + tURight*(n1.e1*Math.cos(tVRight) + n2.e1*Math.sin(tVRight));
 							prob2[4] = pTFromRight0.pRight + tURight*(n1.e2*Math.cos(tVRight) + n2.e2*Math.sin(tVRight));
 							prob2[5] = pTFromRight0.pMiddle + tURight*(n1.e3*Math.cos(tVRight) + n2.e3*Math.sin(tVRight));
-							if (prob2[3]>1 || prob2[4] > 1 || prob2[5] > 1) continue;
+							if (prob2[3]>1 || prob2[4] > 1 || prob2[5] > 1 || prob2[3] < 0 || prob2[4] < 0 || prob2[5] < 0) {
+								tVRight += DEG_INCR;
+								continue;
+								}
 							TJunction.setPFromRight(
 									prob2[3],
 									prob2[4],
@@ -404,10 +399,14 @@ public class Graph {
 							
 							for (double tUMiddle = 0; tUMiddle < DIST_FROM_EXP;) {
 								for (double tVMiddle = 0; tVMiddle <2*Math.PI;) {
+									if (tUMiddle == 0.) tVMiddle += 2*Math.PI;
 									prob2[6] = pTFromMiddle0.pLeft + tUMiddle*(n1.e1*Math.cos(tVMiddle) + n2.e1*Math.sin(tVMiddle));
 									prob2[7] = pTFromMiddle0.pRight + tUMiddle*(n1.e2*Math.cos(tVMiddle) + n2.e2*Math.sin(tVMiddle));
 									prob2[8] = pTFromMiddle0.pMiddle + tUMiddle*(n1.e3*Math.cos(tVMiddle) + n2.e3*Math.sin(tVMiddle));
-									if (prob2[6] > 1 || prob2[7] > 1 || prob2[8] > 1) continue;
+									if (prob2[6] > 1 || prob2[7] > 1 || prob2[8] > 1 || prob2[6] < 0 || prob2[7] < 0 || prob2[8] < 0) {
+										tVMiddle += DEG_INCR;
+										continue;
+										}
 									TJunction.setPFromMiddle(
 											prob2[6],
 											prob2[7],
@@ -416,10 +415,14 @@ public class Graph {
 									
 									for (double yULeft = 0; yULeft < DIST_FROM_EXP;) {
 										for (double yVLeft = 0; yVLeft <2*Math.PI;) {
+											if (yULeft == 0.) yVLeft += 2*Math.PI;
 											prob2[9] = pYFromLeft0.pLeft + yULeft*(n1.e1*Math.cos(yVLeft) + n2.e1*Math.sin(yVLeft));
 											prob2[10] = pYFromLeft0.pRight + yULeft*(n1.e2*Math.cos(yVLeft) + n2.e2*Math.sin(yVLeft));
 											prob2[11] = pYFromLeft0.pMiddle + yULeft*(n1.e3*Math.cos(yVLeft) + n2.e3*Math.sin(yVLeft));
-											if (prob2[9] > 1 || prob2[10] > 1 || prob2[11] > 1) continue;
+											if (prob2[9] > 1 || prob2[10] > 1 || prob2[11] > 1 || prob2[9] < 0 || prob2[10] < 0 || prob2[11] < 0) {
+												yVLeft += DEG_INCR;
+												continue;
+												}
 											YJunction.setPFromLeft(
 													prob2[9],
 													prob2[10],
@@ -428,10 +431,14 @@ public class Graph {
 											
 											for (double yURight = 0; yURight < DIST_FROM_EXP;) {
 												for (double yVRight = 0; yVRight <2*Math.PI;) {
+													if (yURight == 0.) yVRight += 2*Math.PI;
 													prob2[12] = pYFromRight0.pLeft + yURight*(n1.e1*Math.cos(yVRight) + n2.e1*Math.sin(yVRight));
 													prob2[13] = pYFromRight0.pRight + yURight*(n1.e2*Math.cos(yVRight) + n2.e2*Math.sin(yVRight));
 													prob2[14] = pYFromRight0.pMiddle + yURight*(n1.e3*Math.cos(yVRight) + n2.e3*Math.sin(yVRight));
-													if (prob2[12] > 1 || prob2[13] > 1 || prob2[14] > 1) continue;
+													if (prob2[12] > 1 || prob2[13] > 1 || prob2[14] > 1 || prob2[12] < 0 || prob2[13] < 0 || prob2[14] < 0) {
+														yVRight += DEG_INCR;
+														continue;
+														}
 													YJunction.setPFromRight(
 															prob2[12],
 															prob2[13],
@@ -440,10 +447,14 @@ public class Graph {
 													
 													for (double yUMiddle = 0; yUMiddle < DIST_FROM_EXP;) {
 														for (double yVMiddle = 0; yVMiddle <2*Math.PI;) {
+															if (yUMiddle == 0.) yVMiddle += 2*Math.PI;
 															prob2[15] = pYFromMiddle0.pLeft + yUMiddle*(n1.e1*Math.cos(yVMiddle) + n2.e1*Math.sin(yVMiddle));
 															prob2[16] = pYFromMiddle0.pRight + yUMiddle*(n1.e2*Math.cos(yVMiddle) + n2.e2*Math.sin(yVMiddle));
 															prob2[17] = pYFromMiddle0.pMiddle + yUMiddle*(n1.e3*Math.cos(yVMiddle) + n2.e3*Math.sin(yVMiddle));
-															if (prob2[15] > 1 || prob2[16] > 1 || prob2[17] > 1) continue;
+															if (prob2[15] > 1 || prob2[16] > 1 || prob2[17] > 1 || prob2[15] < 0 || prob2[16] < 0 || prob2[17] < 0) {
+																yVMiddle += DEG_INCR;
+																continue;
+																}
 															YJunction.setPFromMiddle(
 																	prob2[15],
 																	prob2[16],
@@ -452,30 +463,35 @@ public class Graph {
 															
 															for (double lU = 0; lU < DIST_FROM_EXP;) {
 																for (double lV = 0; lV <2*Math.PI;) {
+																	if (lU == 0.) lV += 2*Math.PI;
 																	prob2[18] = pL0.e1 + lU*(n1.e1*Math.cos(lV) + n2.e1*Math.sin(lV));
 																	prob2[19] = pL0.e2 + lU*(n1.e2*Math.cos(lV) + n2.e2*Math.sin(lV));
 																	prob2[20] = pL0.e3 + lU*(n1.e3*Math.cos(lV) + n2.e3*Math.sin(lV));
-																	if (prob2[18] > 1 || prob2[19] > 1 || prob2[20] > 1) continue;
-																	LJunction.setProbabilities(
-																			prob2[18],
-																			prob2[19],
-																			prob2[20]
+																	if (prob2[18] > 1 || prob2[19] > 1 || prob2[20] > 1 || prob2[18] < 0 || prob2[19] < 0 || prob2[20] < 0 ) {
+																		lV += DEG_INCR;//FIXXXXX
+																		continue;
+																		}
+																	LJunction.setProbabilities( 
+																			prob2[18], 
+																			prob2[19], 
+																			prob2[20] 
 																					); 
 																	
-																	{
-																		//grade and stuff
-																		this.solve();
-																		curScore = this.grade(true, false);
-																		if (curScore < prevScore) {
-																			System.out.println(Math.sqrt(curScore));
-																			//store the values
-																			for (int i = 0; i < prob2.length; i++) {
-																				probBest[i] = prob2[i];
-																				}
-																			prevScore = curScore;
+																	//**********************************************************
+																	//grade and stuff
+																	this.solve();
+																	curScore = this.grade(true, false);
+																	//System.out.println("running");
+																	if (curScore < prevScore) {
+																		System.out.println(Math.sqrt(curScore));
+																		//store the values
+																		for (int i = 0; i < prob2.length; i++) {
+																			probBest[i] = prob2[i];
 																			}
-																		
-																	}
+																		prevScore = curScore;
+																		}
+																	this.resetWeights();
+																	//***********************************************************
 																	
 																	lV += DEG_INCR;
 																	}
@@ -509,32 +525,22 @@ public class Graph {
 					}
 				tULeft += RADII_INCR;
 				}
-			//	END T
-			//solve with new probs
-			//grade
-			//if grade better than prev, store
-			//loop
-			return prob2;
-			//done iterating over all parameters: return/export best probabilties and resolve->export the graph?
+			return probBest;
 			} else {
+			
+				//non uniform maze, doesnt have Y junctions
+				double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 4); //4 layers of 10*10 nested operations. 100**4 operations
+				System.out.println("Estimated time of calc assuming 7000 operations/second: " + estLengthOfOp /(7000) + "s");
 				
-				TripletProbabilities<Double, Double, Double> pTFromMiddle0, pTFromLeft0, pTFromRight0, pYFromMiddle0, pYFromLeft0, pYFromRight0;
-				
-				
-				Triplet<Double, Double, Double> pL0 = LJunction.getCopyProbabilities();
-				
+				TripletProbabilities<Double, Double, Double> pTFromMiddle0, pTFromLeft0, pTFromRight0;
 				pTFromMiddle0 = TJunction.getCopyPFromMiddle();
 				pTFromLeft0 = TJunction.getCopyPFromLeft();
 				pTFromRight0 = TJunction.getCopyPFromRight();
-			
-				//FOR TESTING PURPOSES TODO: DELETE/FIX
-				pYFromMiddle0 = new TripletProbabilities<>(.33, .33, .33);
-				pYFromLeft0 = new TripletProbabilities<>(.33, .33, .33);
-				pYFromRight0 = new TripletProbabilities<>(.33, .33, .33);
+				Triplet<Double, Double, Double> pL0 = LJunction.getCopyProbabilities();
 				
 				Triplet<Double, Double, Double> n1 = new Triplet<>(-1/Math.sqrt(2), 0., 1/Math.sqrt(2));
 				Triplet<Double, Double, Double> n2 = new Triplet<>(1/Math.sqrt(6), -2/Math.sqrt(6), 1/Math.sqrt(2));
-			
+				
 				double prevScore = Double.MAX_VALUE;
 				double curScore;
 				
@@ -551,7 +557,7 @@ public class Graph {
 						if (prob2[0] > 1 || prob2[1] > 1 || prob2[2] > 1 || prob2[0] < 0 || prob2[1] < 0 || prob2[2] < 0) {
 							tVLeft += DEG_INCR;
 							continue;
-						}
+							}
 						TJunction.setPFromLeft(
 								prob2[0],
 								prob2[1],
@@ -567,7 +573,7 @@ public class Graph {
 								if (prob2[3]>1 || prob2[4] > 1 || prob2[5] > 1 || prob2[3] < 0 || prob2[4] < 0 || prob2[5] < 0) {
 									tVRight += DEG_INCR;
 									continue;
-								}
+									}
 								TJunction.setPFromRight(
 										prob2[3],
 										prob2[4],
@@ -583,111 +589,50 @@ public class Graph {
 										if (prob2[6] > 1 || prob2[7] > 1 || prob2[8] > 1 || prob2[6] < 0 || prob2[7] < 0 || prob2[8] < 0) {
 											tVMiddle += DEG_INCR;
 											continue;
-										}
+											}
 										TJunction.setPFromMiddle(
 												prob2[6],
 												prob2[7],
 												prob2[8]
 														);
 										
-										for (double yULeft = 0; yULeft < DIST_FROM_EXP;) {
-											for (double yVLeft = 0; yVLeft <2*Math.PI;) {
-												if (yULeft == 0.) yVLeft += 2*Math.PI;
-												prob2[9] = pYFromLeft0.pLeft + yULeft*(n1.e1*Math.cos(yVLeft) + n2.e1*Math.sin(yVLeft));
-												prob2[10] = pYFromLeft0.pRight + yULeft*(n1.e2*Math.cos(yVLeft) + n2.e2*Math.sin(yVLeft));
-												prob2[11] = pYFromLeft0.pMiddle + yULeft*(n1.e3*Math.cos(yVLeft) + n2.e3*Math.sin(yVLeft));
-												if (prob2[9] > 1 || prob2[10] > 1 || prob2[11] > 1 || prob2[9] < 0 || prob2[10] < 0 || prob2[11] < 0) {
-													yVLeft += DEG_INCR;
+										for (double lU = 0; lU < DIST_FROM_EXP;) {
+											for (double lV = 0; lV <2*Math.PI;) {
+												if (lU == 0.) lV += 2*Math.PI;
+												prob2[18] = pL0.e1 + lU*(n1.e1*Math.cos(lV) + n2.e1*Math.sin(lV));
+												prob2[19] = pL0.e2 + lU*(n1.e2*Math.cos(lV) + n2.e2*Math.sin(lV));
+												prob2[20] = pL0.e3 + lU*(n1.e3*Math.cos(lV) + n2.e3*Math.sin(lV));
+												if (prob2[18] > 1 || prob2[19] > 1 || prob2[20] > 1 || prob2[18] < 0 || prob2[19] < 0 || prob2[20] < 0 ) {
+													lV += DEG_INCR;//FIXXXXX
 													continue;
-												}
-												YJunction.setPFromLeft(
-														prob2[9],
-														prob2[10],
-														prob2[11]
+													}
+												LJunction.setProbabilities( 
+														prob2[18], 
+														prob2[19], 
+														prob2[20] 
 																); 
 												
-												for (double yURight = 0; yURight < DIST_FROM_EXP;) {
-													for (double yVRight = 0; yVRight <2*Math.PI;) {
-														if (yURight == 0.) yVRight += 2*Math.PI;
-														prob2[12] = pYFromRight0.pLeft + yURight*(n1.e1*Math.cos(yVRight) + n2.e1*Math.sin(yVRight));
-														prob2[13] = pYFromRight0.pRight + yURight*(n1.e2*Math.cos(yVRight) + n2.e2*Math.sin(yVRight));
-														prob2[14] = pYFromRight0.pMiddle + yURight*(n1.e3*Math.cos(yVRight) + n2.e3*Math.sin(yVRight));
-														if (prob2[12] > 1 || prob2[13] > 1 || prob2[14] > 1 || prob2[12] < 0 || prob2[13] < 0 || prob2[14] < 0) {
-															yVRight += DEG_INCR;
-															continue;
+												//**********************************************************
+												//grade and stuff
+												this.solve();
+												curScore = this.grade(true, false);
+												//System.out.println("running");
+												if (curScore < prevScore) {
+													System.out.println(Math.sqrt(curScore));
+													//store the values
+													for (int i = 0; i < prob2.length; i++) {
+														probBest[i] = prob2[i];
 														}
-														YJunction.setPFromRight(
-																prob2[12],
-																prob2[13],
-																prob2[14]
-																		);
-														
-														for (double yUMiddle = 0; yUMiddle < DIST_FROM_EXP;) {
-															for (double yVMiddle = 0; yVMiddle <2*Math.PI;) {
-																if (yUMiddle == 0.) yVMiddle += 2*Math.PI;
-																prob2[15] = pYFromMiddle0.pLeft + yUMiddle*(n1.e1*Math.cos(yVMiddle) + n2.e1*Math.sin(yVMiddle));
-																prob2[16] = pYFromMiddle0.pRight + yUMiddle*(n1.e2*Math.cos(yVMiddle) + n2.e2*Math.sin(yVMiddle));
-																prob2[17] = pYFromMiddle0.pMiddle + yUMiddle*(n1.e3*Math.cos(yVMiddle) + n2.e3*Math.sin(yVMiddle));
-																if (prob2[15] > 1 || prob2[16] > 1 || prob2[17] > 1 || prob2[15] < 0 || prob2[16] < 0 || prob2[17] < 0) {
-																	yVMiddle += DEG_INCR;
-																	continue;
-																}
-																YJunction.setPFromMiddle(
-																		prob2[15],
-																		prob2[16],
-																		prob2[17]
-																				);
-																
-																for (double lU = 0; lU < DIST_FROM_EXP;) {
-																	for (double lV = 0; lV <2*Math.PI;) {
-																		if (lU == 0.) lV += 2*Math.PI;
-																		prob2[18] = pL0.e1 + lU*(n1.e1*Math.cos(lV) + n2.e1*Math.sin(lV));
-																		prob2[19] = pL0.e2 + lU*(n1.e2*Math.cos(lV) + n2.e2*Math.sin(lV));
-																		prob2[20] = pL0.e3 + lU*(n1.e3*Math.cos(lV) + n2.e3*Math.sin(lV));
-																		if (prob2[18] > 1 || prob2[19] > 1 || prob2[20] > 1 || prob2[18] < 0 || prob2[19] < 0 || prob2[20] < 0 ) {
-																			lV += DEG_INCR;//FIXXXXX
-																			continue;
-																		}
-																		LJunction.setProbabilities( 
-																				prob2[18], 
-																				prob2[19], 
-																				prob2[20] 
-																						); 
-																		
-																		//**********************************************************
-																		//grade and stuff
-																		this.solve();
-																		curScore = this.grade(true, false);
-																		//System.out.println("running");
-																		if (curScore < prevScore) {
-																			System.out.println(Math.sqrt(curScore));
-																			//store the values
-																			for (int i = 0; i < prob2.length; i++) {
-																				probBest[i] = prob2[i];
-																				}
-																			prevScore = curScore;
-																			}
-																		//***********************************************************
-																		
-																		lV += DEG_INCR;
-																		}
-																	lU += RADII_INCR;
-																	}	
-																//END L
-																
-																yVMiddle += DEG_INCR;
-																}
-															yUMiddle += RADII_INCR;
-															}
-														yVRight += DEG_INCR;
-														}
-													yURight += RADII_INCR;
+													prevScore = curScore;
 													}
-												yVLeft += DEG_INCR;
+												this.resetWeights();
+												//***********************************************************
+												
+												lV += DEG_INCR;
 												}
-											yULeft += RADII_INCR;
-											}					
-										//END Y
+											lU += RADII_INCR;
+											}	
+										//END L
 										
 										tVMiddle += DEG_INCR;
 										}
@@ -701,10 +646,49 @@ public class Graph {
 						}
 					tULeft += RADII_INCR;
 					}
-				return prob2;
+				
+				return probBest;
 				
 			}
 		}
+
+	public double[] loopSweep(int iterations) {
+		double[] ans = null;
+		for (int i = 0; i<iterations; i++) {
+			ans = this.paramSweep();
+			TJunction.setPFromLeft( ans[0], ans[1], ans[2] );
+			TJunction.setPFromRight( ans[3], ans[4], ans[5] );	
+			TJunction.setPFromMiddle( ans[6], ans[7], ans[8] );
+			YJunction.setPFromLeft( ans[9], ans[10], ans[11] ); 	
+			YJunction.setPFromRight( ans[12], ans[13], ans[14] );
+			YJunction.setPFromMiddle( ans[15], ans[16], ans[17] );	
+			LJunction.setProbabilities( ans[18], ans[19], ans[20] ); 	
+			printProbs(ans);
+		}
+		return ans;
+	}
 	
-	
+	public static void printProbs(double[] newProbs) {
+		String probs = " TL: " + newProbs[0] + " " + newProbs[1] + " " + newProbs[2];
+		probs += "\n TR: " + newProbs[3] + " " + newProbs[4] + " " + newProbs[5];
+		probs += "\n TM: " + newProbs[6] + " " + newProbs[7] + " " + newProbs[8];
+		probs += "\n";
+		probs += "\n YL: " + newProbs[9] + " " + newProbs[10] + " " + newProbs[11];
+		probs += "\n YR: " + newProbs[12] + " " + newProbs[13] + " " + newProbs[14];
+		probs += "\n YM: " + newProbs[15] + " " + newProbs[16] + " " + newProbs[17];
+		probs += "\n";
+		probs += "\n L: " + newProbs[18] + " " + newProbs[19] + " " + newProbs[20];
+		probs += "\n";
+		probs += "\n X: " + newProbs[21] + " " + newProbs[22] + " " + newProbs[23] + " " + newProbs[24];
+
+		System.out.println(probs);
+	}
+
+	public void resetWeights() {
+		for (int i = 0; i < nodes.length; i++) {
+			nodes[i].resetEdgeWeights();
+			nodes[i].resetNodeWeight();
+		}
+	}
+
 }

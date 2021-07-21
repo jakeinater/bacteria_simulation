@@ -31,5 +31,10 @@ public class Sink extends Junction {
 		double weight = loss.getOrDefault(key, 0.) + prev.getWeight();
 		loss.put(key, weight);
 	}
+	
+	@Override
+	public void resetEdgeWeights() {
+		prev.resetWeight();
+	}
 
 }

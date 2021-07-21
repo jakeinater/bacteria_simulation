@@ -32,4 +32,8 @@ public class DirEdge {
 	public double getWeight() {
 		return weight;
 	}
+	
+	public void resetWeight() {
+		weight = 0;
+	}
 }

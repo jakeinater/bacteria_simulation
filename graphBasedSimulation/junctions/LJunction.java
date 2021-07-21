@@ -95,4 +95,9 @@ public class LJunction extends Junction {
 		loss.put(key, weight);
 	}
 
+	@Override
+	public void resetEdgeWeights() {
+		e1.resetWeight();
+		e2.resetWeight();
+	}
 }

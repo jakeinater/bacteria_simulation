@@ -142,5 +142,12 @@ public class YJunction extends Junction {
 		weight = loss.getOrDefault(key, 0.) + right.getWeight();
 		loss.put(key, weight);
 	}
+	
+	@Override
+	public void resetEdgeWeights() {
+		left.resetWeight();
+		right.resetWeight();
+		mid.resetWeight();
+	}
 
 }

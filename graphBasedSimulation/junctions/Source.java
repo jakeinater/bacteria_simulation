@@ -35,4 +35,8 @@ public class Source extends Junction {
 		loss.put(key, weight);
 	}
 
+	@Override
+	public void resetEdgeWeights() {
+		next.resetWeight();
+	}
 }

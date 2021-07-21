@@ -63,4 +63,10 @@ public abstract class Junction {
 	//take a hashmap and add the junctions edge weights to the map with a string of nodeIDs as keys, smaller ID first
 	public abstract void addUndirEdges(HashMap<String, Double> loss);
 	
+	public abstract void resetEdgeWeights();
+	
+	public void resetNodeWeight() {
+		this.weight = 0;
+	}
+	
 }

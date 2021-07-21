@@ -128,5 +128,16 @@ public class XJunction extends Junction {
 		loss.put(key, weight);
 	}
 	
+	public static QuartetProbabilities<Double, Double, Double, Double> getCopyP(){
+		return new QuartetProbabilities<>(p.pLeft, p.pForward, p.pRight, p.pBack);
+	}
+	
+	@Override
+	public void resetEdgeWeights() {
+		e1.resetWeight();
+		e2.resetWeight();
+		e3.resetWeight();
+		e4.resetWeight();
+	}
 
 }

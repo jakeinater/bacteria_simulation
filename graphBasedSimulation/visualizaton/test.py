@@ -25,7 +25,7 @@ for opt in args:
 
 
 #reading graphML file
-G = nx.read_graphml('../assets/graphs/' + iofile + '.graphml')
+G = nx.read_graphml('../assets/graphs/testing/' + iofile + '.graphml')
 
 #edge and node attributes
 edge_labels = dict( [ ((u,v),'%.1f' % d['weight']) for u,v,d in G.edges(data=True)] )

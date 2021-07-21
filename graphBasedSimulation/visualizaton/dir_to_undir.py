@@ -22,7 +22,7 @@ for opt in args:
 
 
 #reading graphML file
-DG = nx.read_graphml('../assets/graphs/LJunction/' + iofile + '.graphml')
+DG = nx.read_graphml('../assets/graphs/testing/' + iofile + '.graphml')
 #DG = nx.read_graphml('../assets/graphs/' + iofile + '.graphml')
 
 #convert to undirected graph
@@ -60,9 +60,9 @@ ax.imshow(img)
 
 
 #drawing the graph
-VMAX = 2000
+#VMAX = 2000
 #VMIN=min(edge_colors)
-#VMAX=max(edge_colors)
+VMAX=max(edge_colors)
 
 nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7,
         edge_color=edge_colors, edge_cmap=plt.cm.inferno, width=9, alpha=.8, edge_vmin=0, edge_vmax=VMAX)
