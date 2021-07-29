@@ -51,7 +51,6 @@ else:
 
 ax.imshow(img)
 
-
 #drawing the graph
 #VMAX = 2000
 VMIN=min(edge_colors)
@@ -76,6 +75,8 @@ cb._A = []
 
 plt.colorbar(cb)
 
+path = "C:/Users/jakei/OneDrive - McGill University/SURE2021/";
+#path = 'D:/SURE/'
 
 #drawing and saving figure
 
@@ -83,23 +84,23 @@ if uniform:
     if labelled:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=4, 
                 bbox=dict(alpha=0), font_color='white')
-        Path('D:/SURE/Figures/uni-maze/labelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
-        plt.savefig('D:/SURE/Figures/uni-maze/labelled/' + date.today().isoformat() + '/' 
+        Path( path + '/Figures/uni-maze/labelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
+        plt.savefig( path + '/Figures/uni-maze/labelled/' + date.today().isoformat() + '/' 
                 + iofile + '_labelled_2.tif', dpi=300)
     else:
-        Path('D:/SURE/Figures/uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
-        plt.savefig('D:/SURE/Figures/uni-maze/unlabelled/' + date.today().isoformat() + '/' 
+        Path( path + '/Figures/uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
+        plt.savefig( path + '/Figures/uni-maze/unlabelled/' + date.today().isoformat() + '/' 
                 + iofile + '_2.tif', dpi=300)
 else:
     if labelled:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=4, 
                 bbox=dict(alpha=0), font_color='white')
-        Path('D:/SURE/Figures/non-uni-maze/labelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
-        plt.savefig('D:/SURE/Figures/non-uni-maze/labelled/' + date.today().isoformat() + '/' 
+        Path( path + '/Figures/non-uni-maze/labelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
+        plt.savefig( path + '/Figures/non-uni-maze/labelled/' + date.today().isoformat() + '/' 
                 + iofile + '_labelled_2.tif', dpi=300)
     else:
-        Path('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
-        plt.savefig('D:/SURE/Figures/non-uni-maze/unlabelled/' + date.today().isoformat() + '/' 
+        Path( path + '/Figures/non-uni-maze/unlabelled/' + date.today().isoformat()).mkdir(parents=True, exist_ok=True)
+        plt.savefig( path + '/Figures/non-uni-maze/unlabelled/' + date.today().isoformat() + '/' 
                 + iofile + '_2.tif', dpi=300)
 
 #plt.show()

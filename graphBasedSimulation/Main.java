@@ -2,7 +2,9 @@ import core.Graph;
 import io.xml.*;
 import junctions.LJunction;
 import junctions.TJunction;
+import junctions.XJunction;
 import junctions.YJunction;
+import utils.QuartetProbabilities;
 
 public class Main {
 	
@@ -83,6 +85,7 @@ public class Main {
 		YJunction.setPFromRight( newProbs[12], newProbs[13], newProbs[14] );
 		YJunction.setPFromMiddle( newProbs[15], newProbs[16], newProbs[17] );	
 		LJunction.setProbabilities( newProbs[18], newProbs[19], newProbs[20] ); 	
+		XJunction.setProbabilities( newProbs[21], newProbs[22], newProbs[23], newProbs[24] ); 	
 	
 		g0.solve();
 		WriteXML.write(g0, "optimizedEcoliGraph", "graphBasedSimulation/assets/graphs/testing/");
@@ -129,16 +132,80 @@ public class Main {
 		YJunction.setPFromRight( newProbs[12], newProbs[13], newProbs[14] );
 		YJunction.setPFromMiddle( newProbs[15], newProbs[16], newProbs[17] );	
 		LJunction.setProbabilities( newProbs[18], newProbs[19], newProbs[20] ); 	
+		XJunction.setProbabilities( newProbs[21], newProbs[22], newProbs[23], newProbs[24] ); 	
 	
 		g0.solve();
 		WriteXML.write(g0, "LOOP_optimizedEcoliGraph", "graphBasedSimulation/assets/graphs/testing/");
 		g0.grade(true, true);
 
 	}
+	
+	public static void test4PointGen() {
+		double[] XProbs = new double[4*(5*2 + 1)];
+		String maze = "non-uni-maze.txt";
+		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
+
+		Graph g0 = new Graph(path, true, true, false, "ecoli");
+
+		QuartetProbabilities<Double, Double, Double, Double> pX0 = XJunction.getCopyP();
+		XProbs[0] = pX0.pLeft;
+		XProbs[1] = pX0.pForward;
+		XProbs[2] = pX0.pRight;
+		XProbs[3] = pX0.pBack;
+		
+		for (int i = 1; i < 5*2 + 1; i++) {
+			double x0, x1, x2, x3, sum, mag;
+			while (true) {
+				x0 = Math.random()*2.-1.;
+				x1 = Math.random()*2.-1.;
+				x2 = Math.random()*2.-1.;
+				x3 = Math.random()*2.-1.;
+			
+				if (x0*x0 + x1*x1 + x2*x2 + x3*x3 >= 1) 
+					continue;
+				
+				System.out.println("before: " + x0 + ", " + x1 + ", " + x2 + ", " + x3);
+				sum = x0 + x1 + x2 + x3;
+				x0 -= 0.25*sum;
+				x1 -= 0.25*sum;
+				x2 -= 0.25*sum;
+				x3 -= 0.25*sum;
+				mag = Math.sqrt(x0*x0 + x1*x1 + x2*x2 + x3*x3);
+			
+				System.out.println("after: " + x0 + ", " + x1 + ", " + x2 + ", " + x3);
+				XProbs[i*4 + 0] = XProbs[0] + 0.1*x0/mag;
+				XProbs[i*4 + 1] = XProbs[1] + 0.1*x1/mag;
+				XProbs[i*4 + 2] = XProbs[2] + 0.1*x2/mag;
+				XProbs[i*4 + 3] = XProbs[3] + 0.1*x3/mag;
+				if (
+						XProbs[i*4 + 0] < 0 || XProbs[i*4 + 0] > 1 || 
+						XProbs[i*4 + 1] < 0 || XProbs[i*4 + 1] > 1 ||
+						XProbs[i*4 + 2] < 0 || XProbs[i*4 + 2] > 1 ||
+						XProbs[i*4 + 3] < 0 || XProbs[i*4 + 3] > 1
+					)
+					continue;
+				break;
+			}
+		}
+	
+		for (int i = 0; i < 5*2 + 1; i++) {
+			System.out.println("" + XProbs[4*i] + ", " + XProbs[4*i+1] + ", " + XProbs[4*i+2] + ", " +  XProbs[4*i+3]);
+		}
+
+	}
 
 	public static void main(String[] args) {
 		//testParamSweep();
-		//testLoopSweep();
-		generateGraphs("ecoli");
+		testLoopSweep();
+		//generateGraphs("ecoli");
+		//String maze = "non-uni-maze.txt";
+		//String path = "graphBasedSimulation/assets/maze_coords/" + maze;
+		//System.out.println(path);
+
+		//Graph g0 = new Graph(path, true, true, false, "ecoli");
+		//g0.grade(true, true);
+	
+		//test4PointGen();
+
 	}	
 }

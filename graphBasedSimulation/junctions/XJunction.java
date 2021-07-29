@@ -139,5 +139,14 @@ public class XJunction extends Junction {
 		e3.resetWeight();
 		e4.resetWeight();
 	}
+	
+	public static void setProbabilities(Double left, Double forward, Double right, Double back) {
+		p.pLeft = left;
+		p.pRight = right;
+		p.pForward = forward;
+		p.pBack = back;
+	}
+
+
 
 }

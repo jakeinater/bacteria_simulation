@@ -300,7 +300,7 @@ public class Graph {
 		//export graphml of difference
 		if (storeGraphDiff) {
 			//the node IDs must be the same as the ones used in exp heatmap file.
-			WriteXML.writeUndir(this, loss, "optimizedDiff", "graphBasedSimulation/assets/graphs/testing/");
+			WriteXML.writeUndir(this, loss, "test", "graphBasedSimulation/assets/graphs/testing/");
 		}
 		
 		
@@ -321,11 +321,56 @@ public class Graph {
 		final double DEG_INCR = Math.PI*2/NUM_POINTS_ON_CIRC;
 		final double RADII_INCR = DIST_FROM_EXP/NUM_DISTANCES_FROM_EXP; 
 		
-
+		// initialize the X junction probabilities to check
+		double[] XProbs = new double[4*(NUM_POINTS_ON_CIRC*2 + 1)];
+		QuartetProbabilities<Double, Double, Double, Double> pX0 = XJunction.getCopyP();
+		XProbs[0] = pX0.pLeft;
+		XProbs[1] = pX0.pForward;
+		XProbs[2] = pX0.pRight;
+		XProbs[3] = pX0.pBack;
+		double x0;
+		double x1;
+		double x2;
+		double x3;
+		double sum;
+		double mag;
+		for (int i = 1; i < NUM_POINTS_ON_CIRC*2 + 1; i++) {
+			while (true) {
+				x0 = Math.random()*2.-1.;
+				x1 = Math.random()*2.-1.;
+				x2 = Math.random()*2.-1.;
+				x3 = Math.random()*2.-1.;
+			
+				if (x0*x0 + x1*x1 + x2*x2 + x3*x3 >= 1) 
+					continue;
+				
+				sum = x0 + x1 + x2 + x3;
+				x0 -= 0.25*sum;
+				x1 -= 0.25*sum;
+				x2 -= 0.25*sum;
+				x3 -= 0.25*sum;
+				mag = Math.sqrt(x0*x0 + x1*x1 + x2*x2 + x3*x3);
+			
+				//assuming checking only one radius other than the centre. If you were to check more you need to use bigger arr
+				XProbs[i*4 + 0] = XProbs[0] + RADII_INCR*x0/mag;
+				XProbs[i*4 + 1] = XProbs[1] + RADII_INCR*x1/mag;
+				XProbs[i*4 + 2] = XProbs[2] + RADII_INCR*x2/mag;
+				XProbs[i*4 + 3] = XProbs[3] + RADII_INCR*x3/mag;
+				if (
+						XProbs[i*4 + 0] < 0 || XProbs[i*4 + 0] > 1 || 
+						XProbs[i*4 + 1] < 0 || XProbs[i*4 + 1] > 1 ||
+						XProbs[i*4 + 2] < 0 || XProbs[i*4 + 2] > 1 ||
+						XProbs[i*4 + 3] < 0 || XProbs[i*4 + 3] > 1
+					) continue;
+				
+				break;
+			}
+		}
+		
 		if (uniform) {
 			//uniform maze, has Y junctions
 			
-			double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 7); //7 layers of 10*10 nested operations. 100**7 operations
+			double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 7)*(NUM_POINTS_ON_CIRC*2 + 1); //7 layers of 10*10 nested operations. 100**7 operations
 			System.out.println("Estimated time of calc assuming 7000 operations/second: " + estLengthOfOp /(7000*60*60) + "hrs");
 
 			TripletProbabilities<Double, Double, Double> pTFromMiddle0, pTFromLeft0, pTFromRight0, pYFromMiddle0, pYFromLeft0, pYFromRight0;
@@ -476,22 +521,35 @@ public class Graph {
 																			prob2[19], 
 																			prob2[20] 
 																					); 
-																	
-																	//**********************************************************
-																	//grade and stuff
-																	this.solve();
-																	curScore = this.grade(true, false);
-																	//System.out.println("running");
-																	if (curScore < prevScore) {
-																		System.out.println(Math.sqrt(curScore));
-																		//store the values
-																		for (int i = 0; i < prob2.length; i++) {
-																			probBest[i] = prob2[i];
+																	for (int xi = 0; xi < NUM_POINTS_ON_CIRC*2 + 1; xi++) {
+																		prob2[21] = XProbs[xi*4];
+																		prob2[22] = XProbs[xi*4 + 1];
+																		prob2[23] = XProbs[xi*4 + 2];
+																		prob2[24] = XProbs[xi*4 + 3];
+																		XJunction.setProbabilities(
+																				prob2[21],
+																				prob2[22],
+																				prob2[23],
+																				prob2[24]
+																						);
+																		
+																		
+																		//**********************************************************
+																		//grade and stuff
+																		this.solve();
+																		curScore = this.grade(true, false);
+																		//System.out.println("running");
+																		if (curScore < prevScore) {
+																			System.out.println(Math.sqrt(curScore));
+																			//store the values
+																			for (int i = 0; i < prob2.length; i++) {
+																				probBest[i] = prob2[i];
+																				}
+																			prevScore = curScore;
 																			}
-																		prevScore = curScore;
-																		}
-																	this.resetWeights();
-																	//***********************************************************
+																		this.resetWeights();
+																		//***********************************************************
+																	}
 																	
 																	lV += DEG_INCR;
 																	}
@@ -529,7 +587,7 @@ public class Graph {
 			} else {
 			
 				//non uniform maze, doesnt have Y junctions
-				double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 4); //4 layers of 10*10 nested operations. 100**4 operations
+				double estLengthOfOp = Math.pow((NUM_DISTANCES_FROM_EXP - 1)*(NUM_POINTS_ON_CIRC + 1), 4) * (NUM_POINTS_ON_CIRC*2 + 1); //4 layers of 10*10 nested operations. 100**4 operations
 				System.out.println("Estimated time of calc assuming 7000 operations/second: " + estLengthOfOp /(7000) + "s");
 				
 				TripletProbabilities<Double, Double, Double> pTFromMiddle0, pTFromLeft0, pTFromRight0;
@@ -610,23 +668,35 @@ public class Graph {
 														prob2[18], 
 														prob2[19], 
 														prob2[20] 
-																); 
-												
-												//**********************************************************
-												//grade and stuff
-												this.solve();
-												curScore = this.grade(true, false);
-												//System.out.println("running");
-												if (curScore < prevScore) {
-													System.out.println(Math.sqrt(curScore));
-													//store the values
-													for (int i = 0; i < prob2.length; i++) {
-														probBest[i] = prob2[i];
+																);
+												for (int xi = 0; xi < NUM_POINTS_ON_CIRC*2 + 1; xi++) {
+													prob2[21] = XProbs[xi*4];
+													prob2[22] = XProbs[xi*4 + 1];
+													prob2[23] = XProbs[xi*4 + 2];
+													prob2[24] = XProbs[xi*4 + 3];
+													XJunction.setProbabilities(
+															prob2[21],
+															prob2[22],
+															prob2[23],
+															prob2[24]
+															);
+													//**********************************************************
+													//grade and stuff
+													this.solve();
+													curScore = this.grade(true, false);
+													//System.out.println("running");
+													if (curScore < prevScore) {
+														System.out.println(Math.sqrt(curScore));
+														//store the values
+														for (int i = 0; i < prob2.length; i++) {
+															probBest[i] = prob2[i];
+															}
+														prevScore = curScore;
 														}
-													prevScore = curScore;
-													}
-												this.resetWeights();
-												//***********************************************************
+													this.resetWeights();
+													//***********************************************************
+													
+												}
 												
 												lV += DEG_INCR;
 												}
@@ -663,6 +733,7 @@ public class Graph {
 			YJunction.setPFromRight( ans[12], ans[13], ans[14] );
 			YJunction.setPFromMiddle( ans[15], ans[16], ans[17] );	
 			LJunction.setProbabilities( ans[18], ans[19], ans[20] ); 	
+			XJunction.setProbabilities( ans[21], ans[22], ans[23], ans[24] ); 	
 			printProbs(ans);
 		}
 		return ans;
