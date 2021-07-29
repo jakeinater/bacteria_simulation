@@ -46,31 +46,31 @@ public class Main {
 
 	}
 	
-	private static void testGrading() {
+	private static void testGrading(String species) {
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
 
-		Graph g0 = new Graph(path, true, true, false, "ecoli");
-		g0.grade(true, true);
+		Graph g0 = new Graph(path, true, true, false, species);
+		g0.grade(true, true, species);
 		
 		g0.solve();
 		
-		g0.grade(true, true);
+		g0.grade(true, true, species);
 	}
 	
-	private static void testParamSweep() {
+	private static void testParamSweep(String species) {
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
 		
-		new YJunction(true, "ecoli", 100, 0., 0., 100, 100, 100);
+		new YJunction(true, species, 100, 0., 0., 100, 100, 100);
 
-		Graph g0 = new Graph(path, true, true, false, "ecoli");
+		Graph g0 = new Graph(path, true, true, false, species);
 		
 		long startTime = System.currentTimeMillis();
 		
-		double[] newProbs = g0.paramSweep();
+		double[] newProbs = g0.paramSweep(species);
 	
 		long endTime = System.currentTimeMillis();
 		long dur = (endTime-startTime);
@@ -88,8 +88,8 @@ public class Main {
 		XJunction.setProbabilities( newProbs[21], newProbs[22], newProbs[23], newProbs[24] ); 	
 	
 		g0.solve();
-		WriteXML.write(g0, "optimizedEcoliGraph", "graphBasedSimulation/assets/graphs/testing/");
-		g0.grade(true, true);
+		WriteXML.write(g0, "optimized_" + species + "Graph", "graphBasedSimulation/assets/graphs/testing/");
+		g0.grade(true, true, species);
 		
 		System.out.println("done!");
 	}
@@ -114,16 +114,16 @@ public class Main {
 		System.out.println(Runtime.getRuntime().availableProcessors());
 	}
 	
-	public static void testLoopSweep() {
+	public static void testLoopSweep(String species) {
 		String maze = "non-uni-maze.txt";
 		String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		System.out.println(path);
 		
 		new YJunction(true, "ecoli", 100, 0., 0., 100, 100, 100);
 
-		Graph g0 = new Graph(path, true, true, false, "ecoli");
+		Graph g0 = new Graph(path, true, true, false, species);
 		
-		double[] newProbs = g0.loopSweep(10);
+		double[] newProbs = g0.loopSweep(10, species);
 		
 		TJunction.setPFromLeft( newProbs[0], newProbs[1], newProbs[2] );
 		TJunction.setPFromRight( newProbs[3], newProbs[4], newProbs[5] );	
@@ -135,8 +135,8 @@ public class Main {
 		XJunction.setProbabilities( newProbs[21], newProbs[22], newProbs[23], newProbs[24] ); 	
 	
 		g0.solve();
-		WriteXML.write(g0, "LOOP_optimizedEcoliGraph", "graphBasedSimulation/assets/graphs/testing/");
-		g0.grade(true, true);
+		WriteXML.write(g0, "LOOP_optimized_" + species, "graphBasedSimulation/assets/graphs/testing/");
+		g0.grade(true, true, species);
 
 	}
 	
@@ -196,7 +196,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		//testParamSweep();
-		testLoopSweep();
+		testLoopSweep("ecoli");
 		//generateGraphs("ecoli");
 		//String maze = "non-uni-maze.txt";
 		//String path = "graphBasedSimulation/assets/maze_coords/" + maze;

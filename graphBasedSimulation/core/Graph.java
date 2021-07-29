@@ -198,7 +198,7 @@ public class Graph {
 	}
 
 	
-	public double grade(boolean mean, boolean storeGraphDiff) {
+	public double grade(boolean mean, boolean storeGraphDiff, String species) {
 		//helper function for sweep method
 
 		//only applicable to undirected graphs
@@ -215,7 +215,7 @@ public class Graph {
 			
 			//parse through the asset file and create the map using that.
 			try {
-				String file = "non-uni-EC.txt";
+				String file = "non-uni-" + species + ".txt";
 				String path = "graphBasedSimulation/assets/exp_heatmaps/" + file;
 				Scanner f = new Scanner(new File(path));
 			
@@ -256,7 +256,7 @@ public class Graph {
 			
 			//store experimental measurements to view what it looks like
 			if (storeGraphDiff) {
-				WriteXML.writeUndir(this, expHeatmap, "exp_representation_mean", "graphBasedSimulation/assets/graphs/testing/");
+				WriteXML.writeUndir(this, expHeatmap, "exp_representation_mean_" + species, "graphBasedSimulation/assets/graphs/testing/");
 			}
 		}
 	
@@ -300,7 +300,7 @@ public class Graph {
 		//export graphml of difference
 		if (storeGraphDiff) {
 			//the node IDs must be the same as the ones used in exp heatmap file.
-			WriteXML.writeUndir(this, loss, "test", "graphBasedSimulation/assets/graphs/testing/");
+			WriteXML.writeUndir(this, loss, "diff_" + species, "graphBasedSimulation/assets/graphs/testing/");
 		}
 		
 		
@@ -311,7 +311,7 @@ public class Graph {
 	}
 	
 	//loop iter: if grade better store probabilities and continue, else continue. At end return the final stored probabilities.
-	public double[] paramSweep() {
+	public double[] paramSweep(String species) {
 		//update probabilities TODO: include X junction later (4D?)
 		//lots of nested loops, each layer defines a parameter we are sweeping over
 		final double DIST_FROM_EXP = 0.1;			// limit radius to check, not inclusive of rad
@@ -537,7 +537,7 @@ public class Graph {
 																		//**********************************************************
 																		//grade and stuff
 																		this.solve();
-																		curScore = this.grade(true, false);
+																		curScore = this.grade(true, false, species);
 																		//System.out.println("running");
 																		if (curScore < prevScore) {
 																			System.out.println(Math.sqrt(curScore));
@@ -683,7 +683,7 @@ public class Graph {
 													//**********************************************************
 													//grade and stuff
 													this.solve();
-													curScore = this.grade(true, false);
+													curScore = this.grade(true, false, species);
 													//System.out.println("running");
 													if (curScore < prevScore) {
 														System.out.println(Math.sqrt(curScore));
@@ -722,10 +722,10 @@ public class Graph {
 			}
 		}
 
-	public double[] loopSweep(int iterations) {
+	public double[] loopSweep(int iterations, String species) {
 		double[] ans = null;
 		for (int i = 0; i<iterations; i++) {
-			ans = this.paramSweep();
+			ans = this.paramSweep(species);
 			TJunction.setPFromLeft( ans[0], ans[1], ans[2] );
 			TJunction.setPFromRight( ans[3], ans[4], ans[5] );	
 			TJunction.setPFromMiddle( ans[6], ans[7], ans[8] );
