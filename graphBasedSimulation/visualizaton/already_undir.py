@@ -77,10 +77,10 @@ cb._A = []
 
 plt.colorbar(cb)
 
-path = "C:/Users/jakei/OneDrive - McGill University/SURE2021/";
 
 #drawing and saving figure
-#path = 'D:/SURE/'
+#path = "C:/Users/jakei/OneDrive - McGill University/SURE2021/";
+path = 'D:/SURE/'
 
 if uniform:
     if labelled:

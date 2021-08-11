@@ -22,8 +22,8 @@ for opt in args:
 
 
 #reading graphML file
-#DG = nx.read_graphml('../assets/graphs/testing/' + iofile + '.graphml')
-DG = nx.read_graphml('../assets/graphs/Original/' + iofile + '.graphml')
+DG = nx.read_graphml('../assets/graphs/testing/' + iofile + '.graphml')
+#DG = nx.read_graphml('../assets/graphs/Original/' + iofile + '.graphml')
 #DG = nx.read_graphml('../assets/graphs/' + iofile + '.graphml')
 
 #convert to undirected graph

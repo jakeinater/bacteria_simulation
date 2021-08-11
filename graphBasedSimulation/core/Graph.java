@@ -791,4 +791,48 @@ public class Graph {
 		YJunction.resetInit();
 	}
 
+	public void generateExpGraph(String species, boolean mean) {
+		//parse through the asset file and create the map using that.
+		try {
+			String file = "non-uni-" + species + ".txt";
+			String path = "graphBasedSimulation/assets/exp_heatmaps/" + file;
+			Scanner f = new Scanner(new File(path));
+			
+			String[] line;
+			String key;
+			double cur;
+			
+			expHeatmap = new HashMap<>(numDirEdges/2);
+			
+			if (mean) {
+				while (f.hasNext()) {
+					line = f.nextLine().split("\\s+");
+					key = StringKey.stringKey(Integer.parseInt(line[1]), Integer.parseInt(line[2]));
+					cur = Double.parseDouble(line[3]);
+					if (cur > maxExpWeight) maxExpWeight = cur;
+					expHeatmap.put(key, cur);
+					}
+				} else {
+					while (f.hasNext()) {
+						line = f.nextLine().split("\\s+");
+						key = StringKey.stringKey(Integer.parseInt(line[1]), Integer.parseInt(line[2]));
+						cur = Double.parseDouble(line[5]);
+						if (cur > maxExpWeight) maxExpWeight = cur;
+						expHeatmap.put(key, cur);
+						}
+					}
+			} 
+		catch (FileNotFoundException e) {
+			System.out.println("file not found");
+			System.exit(1);
+			} catch (IllegalArgumentException e) {
+				System.out.println("formatting error with file");
+				e.printStackTrace();
+				System.exit(1);
+				}
+		
+		//store experimental measurements to view what it looks like
+		WriteXML.writeUndir(this, expHeatmap, "exp_representation_mean_" + species, "graphBasedSimulation/assets/graphs/testing/");
+	}
+	
 }

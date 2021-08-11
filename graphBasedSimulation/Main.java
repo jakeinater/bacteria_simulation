@@ -143,7 +143,7 @@ public class Main {
 		WriteXML.write(g0, "LOOP_optimized_" + species, "graphBasedSimulation/assets/graphs/testing/");
 		g0.grade(true, true, species);
 		storeProbs(species, newProbs);
-
+		g0.generateExpGraph(species, true);
 	}
 	
 	public static void storeProbs(String species, double[] newProbs) {
@@ -226,6 +226,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		//testParamSweep("ecoli");
+
 		testLoopSweep("ecoli");
 		Graph.resetJunctionProbs();
 		testLoopSweep("fischeri");
@@ -235,6 +236,8 @@ public class Main {
 		testLoopSweep("natriegens");
 		Graph.resetJunctionProbs();
 		testLoopSweep("putida");
+		
+		
 		//generateGraphs("ecoli");
 //		generateGraphs("fischeri");
 //		generateGraphs("marinus");
