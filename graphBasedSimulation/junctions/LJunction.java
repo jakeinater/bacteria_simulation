@@ -100,4 +100,8 @@ public class LJunction extends Junction {
 		e1.resetWeight();
 		e2.resetWeight();
 	}
+	
+	public static void resetInit() {
+		initialized = false;
+	}
 }

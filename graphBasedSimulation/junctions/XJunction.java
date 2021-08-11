@@ -147,6 +147,8 @@ public class XJunction extends Junction {
 		p.pBack = back;
 	}
 
-
+	public static void resetInit() {
+		initialized = false;
+	}
 
 }

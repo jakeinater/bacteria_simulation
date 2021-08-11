@@ -149,5 +149,9 @@ public class YJunction extends Junction {
 		right.resetWeight();
 		mid.resetWeight();
 	}
+	
+	public static void resetInit() {
+		initialized = false;
+	}
 
 }

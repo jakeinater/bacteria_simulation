@@ -754,12 +754,41 @@ public class Graph {
 
 		System.out.println(probs);
 	}
+	
+	public static void storeProbs(String species, double[] newProbs) {
+		String probs = " TL: " + newProbs[0] + " " + newProbs[1] + " " + newProbs[2];
+		probs += "\n TR: " + newProbs[3] + " " + newProbs[4] + " " + newProbs[5];
+		probs += "\n TM: " + newProbs[6] + " " + newProbs[7] + " " + newProbs[8];
+		probs += "\n";
+		probs += "\n YL: " + newProbs[9] + " " + newProbs[10] + " " + newProbs[11];
+		probs += "\n YR: " + newProbs[12] + " " + newProbs[13] + " " + newProbs[14];
+		probs += "\n YM: " + newProbs[15] + " " + newProbs[16] + " " + newProbs[17];
+		probs += "\n";
+		probs += "\n L: " + newProbs[18] + " " + newProbs[19] + " " + newProbs[20];
+		probs += "\n";
+		probs += "\n X: " + newProbs[21] + " " + newProbs[22] + " " + newProbs[23] + " " + newProbs[24];
+
+		String path = "graphBasedSimulation/assets/new_probabilities/" + species + "/";
+		try (PrintStream out = new PrintStream(new FileOutputStream(path + "probs.txt"))) {
+		    out.print(probs);
+		    out.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("error in storing");
+		}
+	}
 
 	public void resetWeights() {
 		for (int i = 0; i < nodes.length; i++) {
 			nodes[i].resetEdgeWeights();
 			nodes[i].resetNodeWeight();
 		}
+	}
+	
+	public static void resetJunctionProbs() {
+		LJunction.resetInit();
+		XJunction.resetInit();
+		TJunction.resetInit();
+		YJunction.resetInit();
 	}
 
 }

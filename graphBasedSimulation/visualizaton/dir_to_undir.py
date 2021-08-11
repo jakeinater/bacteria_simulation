@@ -22,7 +22,8 @@ for opt in args:
 
 
 #reading graphML file
-DG = nx.read_graphml('../assets/graphs/testing/' + iofile + '.graphml')
+#DG = nx.read_graphml('../assets/graphs/testing/' + iofile + '.graphml')
+DG = nx.read_graphml('../assets/graphs/Original/' + iofile + '.graphml')
 #DG = nx.read_graphml('../assets/graphs/' + iofile + '.graphml')
 
 #convert to undirected graph
@@ -70,13 +71,13 @@ nx.draw(G, pos, with_labels=False, node_size=0, font_color='red', font_size=7,
 nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=80, alpha=1, cmap=plt.cm.inferno, vmin=0, vmax=VMAX, node_shape='s')
 
 #color bar
-cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0,VMAX))
+cb = plt.cm.ScalarMappable(cmap=plt.cm.inferno, norm=plt.Normalize(0,1))
 cb._A = []
 
 plt.colorbar(cb)
 
-path = "C:/Users/jakei/OneDrive - McGill University/SURE2021/";
-#path = 'D:/SURE/'
+#path = "C:/Users/jakei/OneDrive - McGill University/SURE2021/";
+path = 'D:/SURE/'
 #drawing and saving figure
 if uniform:
     if labelled:

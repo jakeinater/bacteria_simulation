@@ -1,3 +1,7 @@
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import core.Graph;
 import io.xml.*;
 import junctions.LJunction;
@@ -77,6 +81,7 @@ public class Main {
 		System.out.println("It took " + dur + "ms");
 		
 		printProbs(newProbs);
+		storeProbs(species, newProbs);
 		
 		TJunction.setPFromLeft( newProbs[0], newProbs[1], newProbs[2] );
 		TJunction.setPFromRight( newProbs[3], newProbs[4], newProbs[5] );	
@@ -137,8 +142,33 @@ public class Main {
 		g0.solve();
 		WriteXML.write(g0, "LOOP_optimized_" + species, "graphBasedSimulation/assets/graphs/testing/");
 		g0.grade(true, true, species);
+		storeProbs(species, newProbs);
 
 	}
+	
+	public static void storeProbs(String species, double[] newProbs) {
+		String probs = " TL: " + newProbs[0] + " " + newProbs[1] + " " + newProbs[2];
+		probs += "\n TR: " + newProbs[3] + " " + newProbs[4] + " " + newProbs[5];
+		probs += "\n TM: " + newProbs[6] + " " + newProbs[7] + " " + newProbs[8];
+		probs += "\n";
+		probs += "\n YL: " + newProbs[9] + " " + newProbs[10] + " " + newProbs[11];
+		probs += "\n YR: " + newProbs[12] + " " + newProbs[13] + " " + newProbs[14];
+		probs += "\n YM: " + newProbs[15] + " " + newProbs[16] + " " + newProbs[17];
+		probs += "\n";
+		probs += "\n L: " + newProbs[18] + " " + newProbs[19] + " " + newProbs[20];
+		probs += "\n";
+		probs += "\n X: " + newProbs[21] + " " + newProbs[22] + " " + newProbs[23] + " " + newProbs[24];
+		
+		String path = "graphBasedSimulation/assets/new_probabilities/" + species + "/";
+		try (PrintStream out = new PrintStream(new FileOutputStream(path + "probs.txt"))) {
+			out.print(probs);
+			out.close();
+			} catch (FileNotFoundException e) {
+				System.out.println("error in storing");
+				}
+		}
+	
+
 	
 	public static void test4PointGen() {
 		double[] XProbs = new double[4*(5*2 + 1)];
@@ -195,9 +225,21 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		//testParamSweep();
+		//testParamSweep("ecoli");
 		testLoopSweep("ecoli");
+		Graph.resetJunctionProbs();
+		testLoopSweep("fischeri");
+		Graph.resetJunctionProbs();
+		testLoopSweep("marinus");
+		Graph.resetJunctionProbs();
+		testLoopSweep("natriegens");
+		Graph.resetJunctionProbs();
+		testLoopSweep("putida");
 		//generateGraphs("ecoli");
+//		generateGraphs("fischeri");
+//		generateGraphs("marinus");
+//		generateGraphs("natriegens");
+		//generateGraphs("putida");
 		//String maze = "non-uni-maze.txt";
 		//String path = "graphBasedSimulation/assets/maze_coords/" + maze;
 		//System.out.println(path);

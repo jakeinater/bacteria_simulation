@@ -69,4 +69,5 @@ public abstract class Junction {
 		this.weight = 0;
 	}
 	
+	
 }
