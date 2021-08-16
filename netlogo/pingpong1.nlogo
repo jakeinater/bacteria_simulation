@@ -253,11 +253,11 @@ end
 GRAPHICS-WINDOW
 1098
 53
-2111
-1067
+1508
+464
 -1
 -1
-5.0
+2.0
 1
 10
 1
@@ -325,7 +325,7 @@ INPUTBOX
 254
 261
 start-x
-95.0
+-81.0
 1
 0
 Number
@@ -336,7 +336,7 @@ INPUTBOX
 329
 261
 start-y
--95.0
+-51.0
 1
 0
 Number
@@ -365,7 +365,7 @@ SWITCH
 307
 uniform-head?
 uniform-head?
-1
+0
 1
 -1000
 
@@ -375,7 +375,7 @@ INPUTBOX
 402
 261
 init-head
-80.0
+90.0
 1
 0
 Number
@@ -441,7 +441,7 @@ INPUTBOX
 396
 120
 filename
-straightened.png
+non-uni-maze4.png
 1
 0
 String
@@ -462,7 +462,7 @@ INPUTBOX
 610
 380
 patch1-x
-87.0
+-60.0
 1
 0
 Number
@@ -473,7 +473,7 @@ INPUTBOX
 674
 380
 patch1-y
--87.0
+70.0
 1
 0
 Number
@@ -484,7 +484,7 @@ INPUTBOX
 734
 381
 patch2-x
-87.0
+70.0
 1
 0
 Number
@@ -495,7 +495,7 @@ INPUTBOX
 796
 381
 patch2-y
-87.0
+70.0
 1
 0
 Number
@@ -563,7 +563,7 @@ turtle-size
 turtle-size
 1
 10
-6.5
+8.1
 .1
 1
 NIL
@@ -578,7 +578,7 @@ trace-thickness
 trace-thickness
 0
 10
-5.0
+3.0
 1
 1
 NIL
@@ -601,7 +601,7 @@ INPUTBOX
 271
 622
 bacteria-radius
-0.95
+1.0
 1
 0
 Number

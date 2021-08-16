@@ -310,11 +310,11 @@ end
 GRAPHICS-WINDOW
 1098
 53
-1311
-267
+1508
+464
 -1
 -1
-5.0
+2.0
 1
 10
 1
@@ -324,10 +324,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--20
-20
--20
-20
+-100
+100
+-100
+100
 1
 1
 1
@@ -360,7 +360,7 @@ num-bacteria
 num-bacteria
 1
 100
-16.0
+30.0
 1
 1
 NIL
@@ -382,7 +382,7 @@ INPUTBOX
 254
 261
 start-x
--47.0
+-80.0
 1
 0
 Number
@@ -393,7 +393,7 @@ INPUTBOX
 329
 261
 start-y
-46.0
+-50.0
 1
 0
 Number
@@ -422,7 +422,7 @@ SWITCH
 307
 uniform-head?
 uniform-head?
-1
+0
 1
 -1000
 
@@ -432,7 +432,7 @@ INPUTBOX
 402
 261
 init-head
-80.0
+90.0
 1
 0
 Number
@@ -498,7 +498,7 @@ INPUTBOX
 396
 120
 filename
-plaza.png
+non-uni-maze4.png
 1
 0
 String
@@ -519,7 +519,7 @@ INPUTBOX
 610
 380
 patch1-x
-19.0
+-60.0
 1
 0
 Number
@@ -530,7 +530,7 @@ INPUTBOX
 674
 380
 patch1-y
-19.0
+70.0
 1
 0
 Number
@@ -541,7 +541,7 @@ INPUTBOX
 734
 381
 patch2-x
--19.0
+74.0
 1
 0
 Number
@@ -552,7 +552,7 @@ INPUTBOX
 796
 381
 patch2-y
-19.0
+71.0
 1
 0
 Number
@@ -620,7 +620,7 @@ turtle-size
 turtle-size
 1
 10
-2.0
+8.1
 .1
 1
 NIL
@@ -635,7 +635,7 @@ trace-thickness
 trace-thickness
 0
 10
-2.0
+3.0
 1
 1
 NIL

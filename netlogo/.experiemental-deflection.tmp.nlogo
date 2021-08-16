@@ -89,7 +89,7 @@ end
 to setup-walls ;; set all the paths to white, other black, then set all the black parts that are not bordering a white part to grey and set wall? false
   ask patches [
     ifelse not ((pcolor mod 10) >= 6 and (pcolor mod 10) < 10) [
-      set pcolor 0
+      set pcolor 1
       set wall? true
     ] [
       set pcolor 9.9
@@ -98,9 +98,21 @@ to setup-walls ;; set all the paths to white, other black, then set all the blac
 
   ]
   ask patches [
-    if (all? neighbors [not (pcolor = 9.9)]) and pcolor = 0 [
-      set pcolor 2
+    if (all? neighbors [not (pcolor = 9.9)]) and pcolor = 1 [
+      set pcolor 0
       set wall? false
+    ]
+  ]
+  ask patches [
+    if (any? neighbors with [pcolor = 1]) and pcolor = 0 [
+    set pcolor 0.3
+    set wall? true
+    ]
+  ]
+  ask patches [
+    if (any? neighbors with [pcolor = 0.3]) and pcolor = 0 [
+    set pcolor 0.1
+    set wall? true
     ]
   ]
 
@@ -142,6 +154,8 @@ to setup-turtles
   create-turtles num-bacteria [
     setxy start-x start-y
     set size turtle-size
+    set shape "bacteria"
+    set color grey
     if trace-path? and not heat-map? [
       pen-down
       set pen-size trace-thickness;;2
@@ -248,15 +262,36 @@ end
 to forward-turtles-parallel
   ask turtles [
     let here patch-here
-    let proximal-patches ((walls in-cone (bact-rad + .708) (90)) with [not (self = here)]) ;; - 2 * dtheta
+    let proximal-patches ((walls in-cone (bact-rad + .708) (0)) with [not (self = here)]) ;; - 2 * dtheta
     let walls-infront (min-one-of proximal-patches [distance myself])
     ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
     ;;print walls-infront
+
     ifelse walls-infront = nobody [
       ;;set heading (heading - 20)
-      forward df
+      set proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)])
+      set walls-infront (min-one-of proximal-patches [distance myself])
+      ifelse walls-infront = nobody [
+        forward df
+      ][
+        let a ([angle] of walls-infront)
+        print "  "
+        print a
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+        let scale (incident-x * norm-x + incident-y * norm-y)
+        let rx (incident-x - .9 * scale * norm-x)
+        let ry (incident-y - .9 * scale * norm-y)
+        let gamma (atan rx ry)
+        set heading gamma
+        forward df
+      ]
     ] [
       let a ([angle] of walls-infront)
+      print "  "
+      print a
       let incident-x (sin (heading))
       let incident-y (cos (heading))
       let norm-x (sin a)
@@ -270,7 +305,28 @@ to forward-turtles-parallel
       ;;let d1 ((distance walls-infront) - .71)
       ;;print d1
       ;;forward d1
-      set heading gamma
+      ifelse exp-turn [
+        let tmp (random 100)
+        print gamma
+        ifelse (gamma < a - 4) and (gamma > a + 4) [
+          if (tmp > 77)[
+            set gamma ( 180 + gamma )
+          ]
+        ][
+          ifelse (gamma > a)[
+            if (tmp > 80)[
+              set gamma ( 180 + gamma )
+            ]
+          ][
+            if (tmp > 50) [
+              set gamma (180 + gamma)
+            ]
+          ]
+        ]
+        set heading gamma
+      ][
+        set heading gamma
+      ]
       forward df ;;(df - d1)
 
     ]
@@ -292,7 +348,7 @@ end
 
 to kill-outside
   ask turtles [
-    if [pcolor] of patch-here = 2 [ die ]
+    if [pcolor] of patch-here = 0 [ die ]
   ]
 end
 
@@ -310,11 +366,11 @@ end
 GRAPHICS-WINDOW
 1098
 53
-1611
-567
+1708
+664
 -1
 -1
-5.0
+2.0
 1
 10
 1
@@ -324,10 +380,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--50
-50
--50
-50
+-150
+150
+-150
+150
 1
 1
 1
@@ -360,7 +416,7 @@ num-bacteria
 num-bacteria
 1
 100
-16.0
+10.0
 1
 1
 NIL
@@ -382,7 +438,7 @@ INPUTBOX
 254
 261
 start-x
--47.0
+-120.0
 1
 0
 Number
@@ -393,7 +449,7 @@ INPUTBOX
 329
 261
 start-y
-46.0
+-75.0
 1
 0
 Number
@@ -422,7 +478,7 @@ SWITCH
 307
 uniform-head?
 uniform-head?
-1
+0
 1
 -1000
 
@@ -432,7 +488,7 @@ INPUTBOX
 402
 261
 init-head
-80.0
+90.0
 1
 0
 Number
@@ -455,7 +511,7 @@ SWITCH
 400
 heat-map?
 heat-map?
-0
+1
 1
 -1000
 
@@ -487,7 +543,7 @@ INPUTBOX
 278
 473
 heatmap-buffer
-5.0
+1.0
 1
 0
 Number
@@ -498,7 +554,7 @@ INPUTBOX
 396
 120
 filename
-plaza.png
+non-uni-maze4.png
 1
 0
 String
@@ -519,7 +575,7 @@ INPUTBOX
 610
 380
 patch1-x
-44.0
+112.0
 1
 0
 Number
@@ -530,7 +586,7 @@ INPUTBOX
 674
 380
 patch1-y
-44.0
+106.0
 1
 0
 Number
@@ -541,7 +597,7 @@ INPUTBOX
 734
 381
 patch2-x
--44.0
+115.0
 1
 0
 Number
@@ -552,7 +608,7 @@ INPUTBOX
 796
 381
 patch2-y
-44.0
+-99.0
 1
 0
 Number
@@ -619,8 +675,8 @@ SLIDER
 turtle-size
 turtle-size
 1
-10
-4.9
+50
+36.7
 .1
 1
 NIL
@@ -635,7 +691,7 @@ trace-thickness
 trace-thickness
 0
 10
-4.0
+3.0
 1
 1
 NIL
@@ -700,6 +756,17 @@ repulsion
 NIL
 HORIZONTAL
 
+SWITCH
+570
+513
+674
+546
+exp-turn
+exp-turn
+0
+1
+-1000
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -751,6 +818,16 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+bacteria
+true
+0
+Circle -7500403 true true 120 180 0
+Circle -7500403 true true 120 150 60
+Circle -7500403 true true 116 161 67
+Circle -7500403 true true 118 178 62
+Circle -7500403 true true 129 204 42
+Circle -7500403 true true 129 144 42
 
 box
 false
