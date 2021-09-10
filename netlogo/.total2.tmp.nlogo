@@ -64,7 +64,7 @@ to setup
   print bact-rad
   set dtheta diff-rot ;;1.466 ;;10.265
 
-  sobel
+
 
   reset-ticks
 end
@@ -81,16 +81,58 @@ to go
   ]
 
   if diffusion? [ diffuse-turtles-experimental ]
-  forward-turtles-parallel
-  kill-outside ;;kills any turtles that make it out of the channels
+
+  ;;*********** choose motility ****************************
+
+  if motility = "parallel" [
+    forward-turtles-parallel
+  ]
+
+  if motility = "pingpong" [
+    forward-turtles-pingpong
+  ]
+
+  if motility = "E.coli" [
+    forward-turtles-ecoli
+  ]
+
+  if motility = "M.marinus" [
+    forward-turtles-pingpong
+  ]
+
+  if motility = "V.natriegens" [
+    print "not implemented"
+    forward-turtles-pingpong
+  ]
+
+  if motility = "V.fischeri" [
+    print "not implemented"
+    forward-turtles-pingpong
+  ]
+
+  if motility = "P.putida" [
+    print "not implemented"
+    forward-turtles-pingpong
+  ]
+
+  if motility = "custom" [
+    print "not implemented"
+    forward-turtles-pingpong
+  ]
+
+  ;;*************************************************************
+
+  teleport-back ;;moves turtles that glitched out of channels
+  kill-outside ;;kills any turtles that can't make it back to their channels
 
   tick
 end
 
-to setup-walls ;; set all the paths to white, other black, then set all the black parts that are not bordering a white part to grey and set wall? false
+to setup-walls
+
   ask patches [
     ifelse not ((pcolor mod 10) >= 6 and (pcolor mod 10) < 10) [
-      set pcolor 0
+      set pcolor 1
       set wall? true
     ] [
       set pcolor 9.9
@@ -99,13 +141,22 @@ to setup-walls ;; set all the paths to white, other black, then set all the blac
 
   ]
   ask patches [
-    if (all? neighbors [not (pcolor = 9.9)]) and pcolor = 0 [
-      set pcolor 2
+    if (all? neighbors [not (pcolor = 9.9)]) and pcolor = 1 [
+      set pcolor 0
       set wall? false
     ]
   ]
 
+  ask patches [
+    if (any? neighbors with [pcolor = 1]) and pcolor = 0 [
+      set pcolor 0.5
+      set wall? true
+    ]
+  ]
+
   set walls (patches with [wall? = true])
+
+  sobel
 end
 
 to update-heatmap
@@ -248,10 +299,12 @@ to diffuse-turtles-experimental
 
 end
 
+;;************************* Forward regimes ***************************************
+
 to forward-turtles-parallel
   ask turtles [
     let here patch-here
-    let proximal-patches ((walls in-cone (bact-rad + .708) (90)) with [not (self = here)]) ;; - 2 * dtheta
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
     let walls-infront (min-one-of proximal-patches [distance myself])
     ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
     ;;print walls-infront
@@ -260,15 +313,90 @@ to forward-turtles-parallel
       forward df
     ] [
       let a ([angle] of walls-infront)
+
+      ifelse heading = ( a + 180 ) mod 360 [
+        set heading a
+      ] [
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+        let scale (incident-x * norm-x + incident-y * norm-y)
+        let rx (incident-x - 1 * scale * norm-x)
+        let ry (incident-y - 1 * scale * norm-y)
+        let gamma (atan rx ry)
+
+        ;;let d1 ((distance walls-infront) - .71)
+        ;;print d1
+        ;;forward d1
+        ;;ifelse [pcolor] of (patch-at-heading-and-distance gamma df) = 9.9 [
+
+        set heading gamma
+
+      ]
+
+      forward df
+
+    ]
+  ]
+end
+
+to forward-turtles-ecoli
+  ask turtles [
+    let here patch-here
+    let proximal-patches ((walls in-cone (bact-rad + 1.708) (10)) with [not (self = here)]) ;; - 2 * dtheta
+    let walls-infront (min-one-of proximal-patches [distance myself])
+    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
+    ;;print walls-infront
+    ifelse walls-infront = nobody [
+      ;;set heading (heading - 20)
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
+
+      ifelse heading = ( a + 180 ) mod 360 [
+        set heading a
+      ] [
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+        let scale (incident-x * norm-x + incident-y * norm-y)
+        let rx (incident-x - .9 * scale * norm-x)
+        let ry (incident-y - .9 * scale * norm-y)
+        let gamma (atan rx ry)
+
+        ;;let d1 ((distance walls-infront) - .71)
+        ;;print d1
+        ;;forward d1
+        set heading gamma
+      ]
+
+      forward df ;;(df - d1)
+
+    ]
+  ]
+end
+
+to forward-turtles-pingpong
+  ask turtles [
+    let here patch-here
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180 - 2 * dtheta)) with [not (self = here)]) ;; - 2 * dtheta
+    let walls-infront (min-one-of proximal-patches [distance myself])
+    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
+    ;;print walls-infront
+    ifelse walls-infront = nobody [
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
       let incident-x (sin (heading))
       let incident-y (cos (heading))
       let norm-x (sin a)
       let norm-y (cos a)
       let scale (incident-x * norm-x + incident-y * norm-y)
-      let rx (incident-x - .9 * scale * norm-x)
-      let ry (incident-y - .9 * scale * norm-y)
+      let rx (incident-x - 2 * scale * norm-x)
+      let ry (incident-y - 2 * scale * norm-y)
       let gamma (atan rx ry)
-
 
       ;;let d1 ((distance walls-infront) - .71)
       ;;print d1
@@ -279,6 +407,8 @@ to forward-turtles-parallel
     ]
   ]
 end
+
+;;*********************************************************************************
 
 to sobel
   ask walls [
@@ -295,7 +425,23 @@ end
 
 to kill-outside
   ask turtles [
-    if [pcolor] of patch-here = 2 [ die ]
+    if [pcolor] of patch-here = 0 [ die ]
+  ]
+end
+
+to teleport-back
+  ask turtles [
+    if not ([pcolor] of patch-here = 9.9) [
+      let proximal-patches ((wall in-radius 10) with [pcolor = 9.9])
+      let closest-path (min-one-of proximal-patches [distance myself])
+      let delx (([pxcor] of closest-path) - xcor)
+      let dely (([pycor] of closest-path) - ycor)
+
+      let scale (sqrt (delx * delx + dely * dely ))
+      let xf (xcor + delx / scale)
+      let yf (ycor + dely / scale)
+      setxy xf yf
+    ]
   ]
 end
 
@@ -363,7 +509,7 @@ num-bacteria
 num-bacteria
 1
 100
-29.0
+1.0
 1
 1
 NIL
@@ -374,10 +520,10 @@ CHOOSER
 124
 377
 169
-agent
-agent
-"E.coli"
-0
+motility
+motility
+"E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom"
+5
 
 INPUTBOX
 182
@@ -623,7 +769,7 @@ turtle-size
 turtle-size
 1
 50
-8.1
+30.0
 1
 1
 NIL
@@ -645,13 +791,13 @@ NIL
 HORIZONTAL
 
 SWITCH
-179
-512
-288
-545
+23
+58
+132
+91
 diffusion?
 diffusion?
-0
+1
 1
 -1000
 
@@ -702,28 +848,6 @@ repulsion
 1
 NIL
 HORIZONTAL
-
-SWITCH
-11
-75
-101
-108
-test
-test
-0
-1
--1000
-
-INPUTBOX
-12
-128
-85
-188
-stop
-10.0
-1
-0
-Number
 
 @#$#@#$#@
 ## WHAT IS IT?
