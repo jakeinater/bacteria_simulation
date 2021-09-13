@@ -344,13 +344,41 @@ end
 to forward-turtles-ecoli
   ask turtles [
     let here patch-here
-    let proximal-patches ((walls in-cone (bact-rad + 1.708) (10)) with [not (self = here)]) ;; - 2 * dtheta
+    let proximal-patches ((walls in-cone (bact-rad + 0.708) (10)) with [not (self = here)]) ;; - 2 * dtheta
     let walls-infront (min-one-of proximal-patches [distance myself])
     ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
     ;;print walls-infront
     ifelse walls-infront = nobody [
-      ;;set heading (heading - 20)
-      forward df
+
+      ;; if nobody in front, check peripherals
+      set proximal-patches ((walls in-cone (bact-rad + 0.708) (180)) with [not (self = here)]) ;; - 2 * dtheta
+      set walls-infront (min-one-of proximal-patches [distance myself])
+      ifelse walls-infront = nobody [
+        ;;
+        forward df
+      ] [
+        let a ([angle] of walls-infront)
+        ifelse heading = ( a + 180 ) mod 360 [
+          set heading a
+        ] [
+          let incident-x (sin (heading))
+          let incident-y (cos (heading))
+          let norm-x (sin a)
+          let norm-y (cos a)
+          let scale (incident-x * norm-x + incident-y * norm-y)
+          let rx (incident-x - 1 * scale * norm-x)
+          let ry (incident-y - 1 * scale * norm-y)
+          let gamma (atan rx ry)
+
+          ;;let d1 ((distance walls-infront) - .71)
+          ;;print d1
+          ;;forward d1
+          ;;ifelse [pcolor] of (patch-at-heading-and-distance gamma df) = 9.9 [
+
+          set heading gamma
+        ]
+        forward df
+      ]
     ] [
       let a ([angle] of walls-infront)
 
@@ -362,8 +390,8 @@ to forward-turtles-ecoli
         let norm-x (sin a)
         let norm-y (cos a)
         let scale (incident-x * norm-x + incident-y * norm-y)
-        let rx (incident-x - .9 * scale * norm-x)
-        let ry (incident-y - .9 * scale * norm-y)
+        let rx (incident-x - 1 * scale * norm-x)
+        let ry (incident-y - 1 * scale * norm-y)
         let gamma (atan rx ry)
 
         ;;let d1 ((distance walls-infront) - .71)
@@ -432,7 +460,10 @@ end
 to teleport-back
   ask turtles [
     if not ([pcolor] of patch-here = 9.9) [
-      let proximal-patches ((wall in-radius 10) with [pcolor = 9.9])
+      let proximal-patches ((patches in-radius 2) with [pcolor = 9.9])
+      if not (any? proximal-patches) [
+        set proximal-patches ((patches in-radius 10) with [pcolor = 9.9])
+      ]
       let closest-path (min-one-of proximal-patches [distance myself])
       let delx (([pxcor] of closest-path) - xcor)
       let dely (([pycor] of closest-path) - ycor)
@@ -509,7 +540,7 @@ num-bacteria
 num-bacteria
 1
 100
-1.0
+11.0
 1
 1
 NIL
@@ -523,7 +554,7 @@ CHOOSER
 motility
 motility
 "E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom"
-5
+0
 
 INPUTBOX
 182
@@ -797,7 +828,7 @@ SWITCH
 91
 diffusion?
 diffusion?
-1
+0
 1
 -1000
 
