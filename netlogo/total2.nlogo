@@ -43,7 +43,22 @@ patches-own [
 to setup
   clear-all
 
-  import-pcolors (word "../assets/" filename)
+  if environment = "uniform maze" [
+    import-pcolors "../assets/straightened.png"
+  ]
+
+  if environment = "non-uniform maze" [
+    import-pcolors "../assets/non-uni-maze4.png"
+  ]
+
+  if environment = "plaza" [
+    import-pcolors "../assets/plaza.png"
+  ]
+
+  if environment = "custom" [
+    import-pcolors (word "../assets/" filename)
+  ]
+
   ;;random-seed 100
   setup-turtles
   setup-walls
@@ -118,6 +133,10 @@ to go
   if motility = "custom" [
     print "not implemented"
     forward-turtles-pingpong
+  ]
+
+  if motility = "parallel2" [
+    forward-turtles-parallel2
   ]
 
   ;;*************************************************************
@@ -341,6 +360,52 @@ to forward-turtles-parallel
   ]
 end
 
+to forward-turtles-parallel2
+  ask turtles [
+    let here patch-here
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
+    let walls-infront (min-one-of proximal-patches [distance myself])
+    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
+    ;;print walls-infront
+    ifelse walls-infront = nobody [
+      ;;set heading (heading - 20)
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
+
+      ifelse heading = ( a + 180 ) mod 360 [
+        let rand (random 2)
+        ifelse rand = 0 [ set heading ( a + 90 ) ][ set heading ( a - 90 ) ]
+      ] [
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+
+        let dotprod ( incident-x * norm-x + incident-y * norm-y )
+        ifelse dotprod > 0 [
+          ;;print "ended up behind wall somehow"
+          ;; agent somehow ended up behind wall, let it move forward to escape
+        ] [
+          let crossprod ( norm-x * incident-y - norm-y * incident-x )
+          ifelse crossprod < 0 [
+            print "initially facing left relative to wall"
+            set heading ( a + 90 )
+          ]    [
+            print "initially facing right relative to wall"
+            set heading ( a - 90 )
+          ]
+          let angle-between ( asin crossprod )
+          print angle-between
+        ]
+      ]
+
+      forward df
+
+    ]
+  ]
+end
+
 to forward-turtles-ecoli
   ask turtles [
     let here patch-here
@@ -553,8 +618,8 @@ CHOOSER
 169
 motility
 motility
-"E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom"
-0
+"E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom" "parallel2"
+8
 
 INPUTBOX
 182
@@ -612,7 +677,7 @@ INPUTBOX
 402
 261
 init-head
-90.0
+45.0
 1
 0
 Number
@@ -624,7 +689,7 @@ SWITCH
 355
 trace-path?
 trace-path?
-1
+0
 1
 -1000
 
@@ -673,9 +738,9 @@ heatmap-buffer
 Number
 
 INPUTBOX
-180
+331
 60
-396
+483
 120
 filename
 non-uni-maze4.png
@@ -828,15 +893,15 @@ SWITCH
 91
 diffusion?
 diffusion?
-0
+1
 1
 -1000
 
 INPUTBOX
-180
-562
-271
-622
+187
+488
+278
+548
 bacteria-radius
 1.0
 1
@@ -879,6 +944,16 @@ repulsion
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+179
+59
+327
+104
+environment
+environment
+"uniform maze" "non-uniform maze" "plaza" "custom file"
+2
 
 @#$#@#$#@
 ## WHAT IS IT?
