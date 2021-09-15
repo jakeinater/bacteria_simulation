@@ -80,6 +80,92 @@ to setup
   set dtheta diff-rot ;;1.466 ;;10.265
 
 
+  if motility = "E.coli" [
+    set p-5-deg-left 60
+    set p-5-deg-right 80
+    set p-leftmost 80
+    set p-rightmost 60
+    set critical-wall-angle 30
+    set leftmost-angle 26.7
+    set rightmost-angle 37.2
+
+    set p0 69
+    set p10 15
+    set p20 7
+    set p30 3.5
+    set p40 1
+    set p45 2
+    set p50 1
+    set p60 0.5
+  ]
+
+  if motility = "V.natriegens" [
+    set p-5-deg-left 60
+    set p-5-deg-right 80
+    set p-leftmost 90
+    set p-rightmost 100
+    set critical-wall-angle 30
+    set leftmost-angle 53.9
+    set rightmost-angle 51.7
+
+    set p0 45
+    set p10 22
+    set p20 13
+    set p30 8
+    set p40 6
+    set p45 5
+    set p50 2
+    set p60 1
+  ]
+
+  if motility = "V.fischeri" [
+    set p-5-deg-left 60
+    set p-5-deg-right 80
+    set p-leftmost 80
+    set p-rightmost 80
+    set critical-wall-angle 30
+    set leftmost-angle 33.1
+    set rightmost-angle 42
+
+    set p0 35
+    set p10 28
+    set p20 16
+    set p30 7
+    set p40 5
+    set p45 6
+    set p50 6
+    set p60 3
+  ]
+
+  if motility = "P.putida" [
+    set p-5-deg-left 90
+    set p-5-deg-right 100
+    set p-leftmost 80
+    set p-rightmost 90
+    set critical-wall-angle 30
+    set leftmost-angle 38.5
+    set rightmost-angle 60
+
+    set p0 19
+    set p10 21
+    set p20 25
+    set p30 15
+    set p40 12
+    set p45 12
+    set p50 7
+    set p60 3
+  ]
+
+  if motility = "M.marinus" [
+    set p0 10
+    set p10 40
+    set p20 28
+    set p30 13
+    set p40 4
+    set p45 13
+    set p50 1
+    set p60 0.9
+  ]
 
   reset-ticks
 end
@@ -108,7 +194,7 @@ to go
   ]
 
   if motility = "E.coli" [
-    forward-turtles-ecoli
+    forward-turtles-parallel-experimental
   ]
 
   if motility = "M.marinus" [
@@ -116,23 +202,19 @@ to go
   ]
 
   if motility = "V.natriegens" [
-    print "not implemented"
-    forward-turtles-pingpong
+    forward-turtles-parallel-experimental
   ]
 
   if motility = "V.fischeri" [
-    print "not implemented"
-    forward-turtles-pingpong
+    forward-turtles-parallel-experimental
   ]
 
   if motility = "P.putida" [
-    print "not implemented"
-    forward-turtles-pingpong
+    forward-turtles-parallel-experimental
   ]
 
   if motility = "custom" [
-    print "not implemented"
-    forward-turtles-pingpong
+    forward-turtles-parallel-experimental
   ]
 
   if motility = "parallel2" [
@@ -270,36 +352,36 @@ to diffuse-turtles-experimental
         set left-right (-1) ;;turn left
       ]
 
-      ifelse tmp < 690 [
+      ifelse tmp < p0 * 10 [
       set heading (heading)
       ][
 
-        ifelse tmp < (690 + 150) [
+        ifelse tmp < (p0 + p10) * 10 [
           set heading (heading + left-right * 10)
         ][
 
-          ifelse tmp < (690 + 150 + 70) [
+          ifelse tmp < (p0 + p10 + p20) * 10 [
             set heading (heading + left-right * 20)
           ][
 
-            ifelse tmp < (690 + 150 + 70 + 35) [
+            ifelse tmp < (p0 + p10 + p20 + p30) * 10 [
               set heading (heading + left-right * 30)
             ][
 
-              ifelse tmp < (690 + 150 + 70 + 35 + 10) [
+              ifelse tmp < (p0 + p10 + p20 + p30 + p40) * 10 [
                 set heading (heading + left-right * 40)
               ][
 
-                ifelse tmp < (690 + 150 + 70 + 35 + 10 + 20) [
+                ifelse tmp < (p0 + p10 + p20 + p30 + p40 + p45) * 10 [
                   set heading (heading + left-right * 45)
                 ][
 
-                  ifelse tmp < (690 + 150 + 70 + 35 + 10 + 20 + 10) [
+                  ifelse tmp < (p0 + p10 + p20 + p30 + p40 + p45 + p50) * 10 [
                     set heading (heading + left-right * 50)
                   ][
-
-
-
+                    if tmp < (p0 + p10 + p20 + p30 + p40 + p45 + p50 + p60) * 10 [
+                      set heading (heading + left-right * 60)
+                    ]
                   ]
 
                 ]
@@ -368,12 +450,13 @@ to forward-turtles-parallel2
     ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
     ;;print walls-infront
     ifelse walls-infront = nobody [
-      ;;set heading (heading - 20)
+      ;;#### BEHAVIOUR if the agent has no wall in front of it ####
       forward df
     ] [
       let a ([angle] of walls-infront)
 
       ifelse heading = ( a + 180 ) mod 360 [
+        ;;#### BEHAVIOUR if the agent hits the wall head-on ####
         let rand (random 2)
         ifelse rand = 0 [ set heading ( a + 90 ) ][ set heading ( a - 90 ) ]
       ] [
@@ -383,19 +466,65 @@ to forward-turtles-parallel2
         let norm-y (cos a)
 
         let dotprod ( incident-x * norm-x + incident-y * norm-y )
+
         ifelse dotprod > 0 [
-          ;;print "ended up behind wall somehow"
-          ;; agent somehow ended up behind wall, let it move forward to escape
-        ] [
+          ;;#### if the agent heading is in the same direction of the wall angle, need to see if within critical angle ####
+          print "nearest wall is not angled towards us"
           let crossprod ( norm-x * incident-y - norm-y * incident-x )
-          ifelse crossprod < 0 [
-            print "initially facing left relative to wall"
-            set heading ( a + 90 )
-          ]    [
-            print "initially facing right relative to wall"
-            set heading ( a - 90 )
-          ]
           let angle-between ( asin crossprod )
+          print angle-between
+
+          ifelse (abs angle-between) > 90 - critical-wall-angle  [
+            ;;#### BEHAVIOUR if within critical wall angle ####
+            ifelse crossprod < 0 [
+              ;;print "initially facing left relative to wall"
+              set heading ( a + 90 )
+            ] [
+              ;;print "initially facing right relative to wall"
+              set heading ( a - 90 )
+            ]
+
+          ][
+            ;;#### BEHAVIOUR if outside critical wall angle ####
+            ;; angle between wall and agent too steep to influence heading: do nothing
+          ]
+        ] [
+
+          ;;agent hitting against wall
+          let crossprod ( norm-x * incident-y - norm-y * incident-x )
+          let angle-between ( asin crossprod )
+          let abs-angle (abs angle-between)
+          ifelse crossprod < 0 [
+            ;;#### BEHAVIOUR if agent hits wall facing left ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing left) ####
+              set heading ( a + 90 )
+            ][
+              ifelse abs-angle < 37.2 [
+                ;;#### BEHAVIOUR if agent is left-facing within the left-most experimental angle ####
+                set heading ( a + 90 )
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the left-most experimental angle ####
+                set heading ( a + 90 )
+              ]
+            ]
+
+          ] [
+            ;;#### BEHAVIOUR if agent hits wall facing right ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing right) ####
+              set heading ( a - 90 )
+            ][
+              ifelse abs-angle < 37.2 [
+                ;;#### BEHAVIOUR if agent is right-facing within the right-most experimental angle ####
+                set heading ( a - 90 )
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the right-most experimental angle ####
+                set heading ( a - 90 )
+              ]
+            ]
+          ]
+
           print angle-between
         ]
       ]
@@ -409,67 +538,181 @@ end
 to forward-turtles-ecoli
   ask turtles [
     let here patch-here
-    let proximal-patches ((walls in-cone (bact-rad + 0.708) (10)) with [not (self = here)]) ;; - 2 * dtheta
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
     let walls-infront (min-one-of proximal-patches [distance myself])
-    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
-    ;;print walls-infront
+
     ifelse walls-infront = nobody [
-
-      ;; if nobody in front, check peripherals
-      set proximal-patches ((walls in-cone (bact-rad + 0.708) (180)) with [not (self = here)]) ;; - 2 * dtheta
-      set walls-infront (min-one-of proximal-patches [distance myself])
-      ifelse walls-infront = nobody [
-        ;;no walls infront or in periphery
-        forward df
-      ] [
-        let a ([angle] of walls-infront)
-        ifelse heading = ( a + 180 ) mod 360 [
-          set heading a
-        ] [
-          let incident-x (sin (heading))
-          let incident-y (cos (heading))
-          let norm-x (sin a)
-          let norm-y (cos a)
-          let scale (incident-x * norm-x + incident-y * norm-y)
-          let rx (incident-x - 1 * scale * norm-x)
-          let ry (incident-y - 1 * scale * norm-y)
-          let gamma (atan rx ry)
-
-          ;;let d1 ((distance walls-infront) - .71)
-          ;;print d1
-          ;;forward d1
-          ;;ifelse [pcolor] of (patch-at-heading-and-distance gamma df) = 9.9 [
-
-          set heading gamma
-        ]
-        forward df
-      ]
+      ;;#### BEHAVIOUR if the agent has no wall in front of it ####
+      forward df
     ] [
       let a ([angle] of walls-infront)
 
       ifelse heading = ( a + 180 ) mod 360 [
-        set heading a
+        ;;#### BEHAVIOUR if the agent hits the wall head-on ####
+        let rand (random 2)
+        ifelse rand = 0 [ set heading ( a + 90 ) ][ set heading ( a - 90 ) ]
       ] [
         let incident-x (sin (heading))
         let incident-y (cos (heading))
         let norm-x (sin a)
         let norm-y (cos a)
-        let scale (incident-x * norm-x + incident-y * norm-y)
-        let rx (incident-x - 1 * scale * norm-x)
-        let ry (incident-y - 1 * scale * norm-y)
-        let gamma (atan rx ry)
 
-        ;;let d1 ((distance walls-infront) - .71)
-        ;;print d1
-        ;;forward d1
-        set heading gamma
+        let dotprod ( incident-x * norm-x + incident-y * norm-y )
+        let crossprod ( norm-x * incident-y - norm-y * incident-x )
+        let angle-between ( asin crossprod )
+
+        ifelse dotprod > 0 [
+          ;;#### if the agent heading is in the same direction of the wall angle, need to see if within critical angle ####
+
+          ifelse (abs angle-between) > 90 - critical-wall-angle  [
+            ;;#### BEHAVIOUR if within critical wall angle ####
+            ifelse crossprod < 0 [
+              set heading ( a + 90 )
+            ] [
+              set heading ( a - 90 )
+            ]
+
+          ][
+            ;;#### BEHAVIOUR if outside critical wall angle ####
+            ;; angle between wall and agent too steep to influence heading: do nothing
+          ]
+        ] [
+          ;;agent hitting against wall
+
+          let abs-angle (abs angle-between)
+          ifelse crossprod < 0 [
+            ;;#### BEHAVIOUR if agent hits wall facing left ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing left) ####
+              let rand (random 100)
+              ifelse rand < p-5-deg-left [ set heading (a + 90) ][ set heading (a - 90) ]
+            ][
+              ifelse abs-angle < leftmost-angle [
+                ;;#### BEHAVIOUR if agent is left-facing within the left-most experimental angle ####
+                let rand (random 100)
+                ifelse rand < p-leftmost [ set heading (a + 90) ][ set heading (a - 90) ]
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the left-most experimental angle ####
+                set heading ( a + 90 )
+              ]
+            ]
+
+          ] [
+            ;;#### BEHAVIOUR if agent hits wall facing right ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing right) ####
+              let rand (random 100)
+              ifelse rand <= p-5-deg-right [ set heading (a - 90) ][ set heading (a + 90) ]
+            ][
+              ifelse abs-angle < rightmost-angle [
+                ;;#### BEHAVIOUR if agent is right-facing within the right-most experimental angle ####
+                let rand (random 100)
+                ifelse rand <= p-rightmost [ set heading (a - 90) ][ set heading (a + 90) ]
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the right-most experimental angle ####
+                set heading ( a - 90 )
+              ]
+            ]
+          ]
+
+        ]
       ]
 
-      forward df ;;(df - d1)
+      forward df
 
     ]
   ]
 end
+
+to forward-turtles-parallel-experimental
+  ask turtles [
+    let here patch-here
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
+    let walls-infront (min-one-of proximal-patches [distance myself])
+
+    ifelse walls-infront = nobody [
+      ;;#### BEHAVIOUR if the agent has no wall in front of it ####
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
+
+      ifelse heading = ( a + 180 ) mod 360 [
+        ;;#### BEHAVIOUR if the agent hits the wall head-on ####
+        let rand (random 2)
+        ifelse rand = 0 [ set heading ( a + 90 ) ][ set heading ( a - 90 ) ]
+      ] [
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+
+        let dotprod ( incident-x * norm-x + incident-y * norm-y )
+        let crossprod ( norm-x * incident-y - norm-y * incident-x )
+        let angle-between ( asin crossprod )
+
+        ifelse dotprod > 0 [
+          ;;#### if the agent heading is in the same direction of the wall angle, need to see if within critical angle ####
+
+          ifelse (abs angle-between) > 90 - critical-wall-angle  [
+            ;;#### BEHAVIOUR if within critical wall angle ####
+            ifelse crossprod < 0 [
+              set heading ( a + 90 )
+            ] [
+              set heading ( a - 90 )
+            ]
+
+          ][
+            ;;#### BEHAVIOUR if outside critical wall angle ####
+            ;; angle between wall and agent too steep to influence heading: do nothing
+          ]
+        ] [
+          ;;agent hitting against wall
+
+          let abs-angle (abs angle-between)
+          ifelse crossprod < 0 [
+            ;;#### BEHAVIOUR if agent hits wall facing left ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing left) ####
+              let rand (random 100)
+              ifelse rand < p-5-deg-left [ set heading (a + 90) ][ set heading (a - 90) ]
+            ][
+              ifelse abs-angle < leftmost-angle [
+                ;;#### BEHAVIOUR if agent is left-facing within the left-most experimental angle ####
+                let rand (random 100)
+                ifelse rand < p-leftmost [ set heading (a + 90) ][ set heading (a - 90) ]
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the left-most experimental angle ####
+                set heading ( a + 90 )
+              ]
+            ]
+
+          ] [
+            ;;#### BEHAVIOUR if agent hits wall facing right ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing right) ####
+              let rand (random 100)
+              ifelse rand <= p-5-deg-right [ set heading (a - 90) ][ set heading (a + 90) ]
+            ][
+              ifelse abs-angle < rightmost-angle [
+                ;;#### BEHAVIOUR if agent is right-facing within the right-most experimental angle ####
+                let rand (random 100)
+                ifelse rand <= p-rightmost [ set heading (a - 90) ][ set heading (a + 90) ]
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the right-most experimental angle ####
+                set heading ( a - 90 )
+              ]
+            ]
+          ]
+
+        ]
+      ]
+
+      forward df
+
+    ]
+  ]
+end
+
 
 to forward-turtles-pingpong
   ask turtles [
@@ -619,7 +862,7 @@ CHOOSER
 motility
 motility
 "E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom" "parallel2"
-8
+4
 
 INPUTBOX
 182
@@ -677,7 +920,7 @@ INPUTBOX
 402
 261
 init-head
-45.0
+90.0
 1
 0
 Number
@@ -893,7 +1136,7 @@ SWITCH
 91
 diffusion?
 diffusion?
-1
+0
 1
 -1000
 
@@ -953,7 +1196,172 @@ CHOOSER
 environment
 environment
 "uniform maze" "non-uniform maze" "plaza" "custom file"
-2
+1
+
+INPUTBOX
+23
+105
+131
+165
+critical-wall-angle
+30.0
+1
+0
+Number
+
+INPUTBOX
+6
+171
+80
+231
+p-5-deg-left
+90.0
+1
+0
+Number
+
+INPUTBOX
+80
+171
+153
+231
+p-5-deg-right
+100.0
+1
+0
+Number
+
+INPUTBOX
+6
+231
+79
+291
+p-leftmost
+80.0
+1
+0
+Number
+
+INPUTBOX
+80
+231
+153
+291
+p-rightmost
+90.0
+1
+0
+Number
+
+INPUTBOX
+0
+303
+88
+363
+leftmost-angle
+38.5
+1
+0
+Number
+
+INPUTBOX
+0
+364
+88
+424
+rightmost-angle
+60.0
+1
+0
+Number
+
+INPUTBOX
+0
+451
+50
+511
+p0
+0.0
+1
+0
+Number
+
+INPUTBOX
+0
+511
+50
+571
+p10
+0.0
+1
+0
+Number
+
+INPUTBOX
+0
+571
+50
+631
+p20
+0.0
+1
+0
+Number
+
+INPUTBOX
+0
+631
+50
+691
+p30
+0.0
+1
+0
+Number
+
+INPUTBOX
+50
+452
+100
+512
+p40
+0.0
+1
+0
+Number
+
+INPUTBOX
+50
+511
+100
+571
+p45
+0.0
+1
+0
+Number
+
+INPUTBOX
+50
+571
+100
+631
+p50
+0.0
+1
+0
+Number
+
+INPUTBOX
+50
+631
+100
+691
+p60
+0.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
