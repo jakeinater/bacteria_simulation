@@ -55,7 +55,7 @@ to setup
     import-pcolors "../assets/plaza.png"
   ]
 
-  if environment = "custom" [
+  if environment = "custom file" [
     import-pcolors (word "../assets/" filename)
   ]
 
@@ -754,7 +754,11 @@ to sobel
     (-1) * ([pcolor] of (patch-at -1 -1)) + ([pcolor] of (patch-at 1 -1))
     let s2 (-1) * ([pcolor] of (patch-at -1 1)) + (-2) * ([pcolor] of (patch-at 0 1)) + (-1) * ([pcolor] of (patch-at 1 1)) +
     ([pcolor] of (patch-at -1 -1)) + (2) * ([pcolor] of (patch-at 0 -1)) + ([pcolor] of (patch-at 1 -1))
-    set angle (((atan s2 s1) + 90) mod 360) ;;adjust for weird angle axis
+    ifelse s2 = 0 and s1 = 0 [
+      ;;do nothing
+    ] [
+      set angle (((atan s2 s1) + 90) mod 360) ;;adjust for weird angle axis
+    ]
 
   ]
 end
@@ -798,11 +802,11 @@ end
 GRAPHICS-WINDOW
 1098
 53
-1508
-464
+2721
+937
 -1
 -1
-2.0
+1.0
 1
 10
 1
@@ -812,10 +816,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--100
-100
--100
-100
+-807
+807
+-437
+437
 1
 1
 1
@@ -848,7 +852,7 @@ num-bacteria
 num-bacteria
 1
 100
-1.0
+6.0
 1
 1
 NIL
@@ -862,7 +866,7 @@ CHOOSER
 motility
 motility
 "E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom" "parallel2"
-4
+0
 
 INPUTBOX
 182
@@ -986,7 +990,7 @@ INPUTBOX
 483
 120
 filename
-non-uni-maze4.png
+Venice.png
 1
 0
 String
@@ -1196,7 +1200,7 @@ CHOOSER
 environment
 environment
 "uniform maze" "non-uniform maze" "plaza" "custom file"
-1
+3
 
 INPUTBOX
 23
@@ -1215,7 +1219,7 @@ INPUTBOX
 80
 231
 p-5-deg-left
-90.0
+60.0
 1
 0
 Number
@@ -1226,7 +1230,7 @@ INPUTBOX
 153
 231
 p-5-deg-right
-100.0
+80.0
 1
 0
 Number
@@ -1248,7 +1252,7 @@ INPUTBOX
 153
 291
 p-rightmost
-90.0
+60.0
 1
 0
 Number
@@ -1259,7 +1263,7 @@ INPUTBOX
 88
 363
 leftmost-angle
-38.5
+26.7
 1
 0
 Number
@@ -1270,7 +1274,7 @@ INPUTBOX
 88
 424
 rightmost-angle
-60.0
+37.2
 1
 0
 Number
@@ -1281,7 +1285,7 @@ INPUTBOX
 50
 511
 p0
-0.0
+69.0
 1
 0
 Number
@@ -1292,7 +1296,7 @@ INPUTBOX
 50
 571
 p10
-0.0
+15.0
 1
 0
 Number
@@ -1303,7 +1307,7 @@ INPUTBOX
 50
 631
 p20
-0.0
+7.0
 1
 0
 Number
@@ -1314,7 +1318,7 @@ INPUTBOX
 50
 691
 p30
-0.0
+3.5
 1
 0
 Number
@@ -1325,7 +1329,7 @@ INPUTBOX
 100
 512
 p40
-0.0
+1.0
 1
 0
 Number
@@ -1336,7 +1340,7 @@ INPUTBOX
 100
 571
 p45
-0.0
+2.0
 1
 0
 Number
@@ -1347,7 +1351,7 @@ INPUTBOX
 100
 631
 p50
-0.0
+1.0
 1
 0
 Number
@@ -1358,7 +1362,7 @@ INPUTBOX
 100
 691
 p60
-0.0
+0.5
 1
 0
 Number
