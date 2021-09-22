@@ -13,6 +13,8 @@
 ;; netlogo restrictions: can make angled walls
 ;;
 
+extensions [vid]
+
 globals [
   dl
   heatmap-max
@@ -168,6 +170,16 @@ to setup
   ]
 
   reset-ticks
+
+  if record-movie? [
+    vid:start-recorder
+    vid:record-view
+    repeat frames [
+      go
+      vid:record-view
+    ]
+    vid:save-recording (word out-file ".mp4")
+  ]
 end
 
 to go
@@ -852,7 +864,7 @@ num-bacteria
 num-bacteria
 1
 100
-6.0
+20.0
 1
 1
 NIL
@@ -874,7 +886,7 @@ INPUTBOX
 254
 261
 start-x
--80.0
+-92.0
 1
 0
 Number
@@ -885,7 +897,7 @@ INPUTBOX
 329
 261
 start-y
--50.0
+-32.0
 1
 0
 Number
@@ -936,7 +948,7 @@ SWITCH
 355
 trace-path?
 trace-path?
-0
+1
 1
 -1000
 
@@ -1112,7 +1124,7 @@ turtle-size
 turtle-size
 1
 50
-28.0
+10.0
 1
 1
 NIL
@@ -1127,7 +1139,7 @@ trace-thickness
 trace-thickness
 0
 10
-3.0
+1.0
 1
 1
 NIL
@@ -1366,6 +1378,49 @@ p60
 1
 0
 Number
+
+SWITCH
+187
+608
+310
+641
+record-movie?
+record-movie?
+0
+1
+-1000
+
+INPUTBOX
+313
+608
+363
+668
+frames
+2000.0
+1
+0
+Number
+
+TEXTBOX
+188
+561
+533
+617
+If record-movie is turned on, simply add the number of frames you want to record and press setup once. The simulation will run and record the frames and output a outfile.mp4 file with playback at 25fps.
+11
+0.0
+1
+
+INPUTBOX
+366
+608
+511
+668
+out-file
+out
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?

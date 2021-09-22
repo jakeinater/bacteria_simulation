@@ -13,3 +13,4 @@ env/
 *.tif
 *.graphml
 .total.tmp.nlogo
+*.mp4
