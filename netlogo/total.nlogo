@@ -197,40 +197,54 @@ to go
 
   ;;*********** choose motility ****************************
 
-  if motility = "parallel" [
-    forward-turtles-parallel
-  ]
+  ifelse (not biased-left) and (not biased-right)
+  [
 
-  if motility = "pingpong" [
-    forward-turtles-pingpong
-  ]
+    if motility = "parallel" [
+      forward-turtles-parallel
+    ]
 
-  if motility = "E.coli" [
-    forward-turtles-parallel-experimental
-  ]
+    if motility = "pingpong" [
+      forward-turtles-pingpong
+    ]
 
-  if motility = "M.marinus" [
-    forward-turtles-pingpong
-  ]
+    if motility = "E.coli" [
+      forward-turtles-parallel-experimental
+    ]
 
-  if motility = "V.natriegens" [
-    forward-turtles-parallel-experimental
-  ]
+    if motility = "M.marinus" [
+      forward-turtles-pingpong
+    ]
 
-  if motility = "V.fischeri" [
-    forward-turtles-parallel-experimental
-  ]
+    if motility = "V.natriegens" [
+      forward-turtles-parallel-experimental
+    ]
 
-  if motility = "P.putida" [
-    forward-turtles-parallel-experimental
-  ]
+    if motility = "V.fischeri" [
+      forward-turtles-parallel-experimental
+    ]
 
-  if motility = "custom" [
-    forward-turtles-parallel-experimental
-  ]
+    if motility = "P.putida" [
+      forward-turtles-parallel-experimental
+    ]
 
-  if motility = "parallel2" [
-    forward-turtles-parallel2
+    if motility = "custom" [
+      forward-turtles-parallel-experimental
+    ]
+
+    if motility = "parallel2" [
+      forward-turtles-parallel2
+    ]
+
+  ]
+  [
+
+   ifelse biased-left [
+      forward-turtles-parallel-biased-left
+    ] [
+      forward-turtles-parallel-biased-right
+    ]
+
   ]
 
   ;;*************************************************************
@@ -395,6 +409,13 @@ to diffuse-turtles-experimental
         set left-right 1 ;;turn right
       ][
         set left-right (-1) ;;turn left
+      ]
+
+      if biased-left [
+        set left-right (-1)
+      ]
+      if biased-right [
+        set left-right 1
       ]
 
       ifelse tmp < p0 * 10 [
@@ -758,6 +779,189 @@ to forward-turtles-parallel-experimental
   ]
 end
 
+to forward-turtles-parallel-biased-left
+  ask turtles [
+    let here patch-here
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
+    let walls-infront (min-one-of proximal-patches [distance myself])
+    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
+    ;;print walls-infront
+    ifelse walls-infront = nobody [
+      ;;#### BEHAVIOUR if the agent has no wall in front of it ####
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
+
+      ifelse heading = ( a + 180 ) mod 360 [
+        ;;#### BEHAVIOUR if the agent hits the wall head-on ####
+        set heading ( a + 90 ) ;;turn left
+      ] [
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+
+        let dotprod ( incident-x * norm-x + incident-y * norm-y )
+
+        ifelse dotprod > 0 [
+          ;;#### if the agent heading is in the same direction of the wall angle, need to see if within critical angle ####
+          ;;print "nearest wall is not angled towards us"
+          let crossprod ( norm-x * incident-y - norm-y * incident-x )
+          let angle-between ( asin crossprod )
+          print angle-between
+
+          ifelse (abs angle-between) > 90 - critical-wall-angle  [
+            ;;#### BEHAVIOUR if within critical wall angle ####
+            ifelse crossprod < 0 [
+              ;;wall to the right of agent
+              ;;do nothing
+            ] [
+              ;;wall to left of agent
+              set heading ( a - 90 )
+            ]
+
+          ][
+            ;;#### BEHAVIOUR if outside critical wall angle ####
+            ;; angle between wall and agent too steep to influence heading: do nothing
+          ]
+        ] [
+
+          ;;agent hitting against wall
+          let crossprod ( norm-x * incident-y - norm-y * incident-x )
+          let angle-between ( asin crossprod )
+          let abs-angle (abs angle-between)
+          ifelse crossprod < 0 [
+            ;;#### BEHAVIOUR if agent hits wall facing left ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing left) ####
+              set heading ( a + 90 )
+            ][
+              ifelse abs-angle < leftmost-angle [
+                ;;#### BEHAVIOUR if agent is left-facing within the left-most experimental angle ####
+                set heading ( a + 90 )
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the left-most experimental angle ####
+                set heading ( a + 90 ) ;;if too extreme, allow it to still turn left
+              ]
+            ]
+
+          ] [
+            ;;#### BEHAVIOUR if agent hits wall facing right ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing right) ####
+              set heading ( a + 90 )
+            ][
+              ifelse abs-angle < rightmost-angle [
+                ;;#### BEHAVIOUR if agent is right-facing within the right-most experimental angle ####
+                set heading ( a + 90 )
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the right-most experimental angle ####
+                set heading ( a - 90 )
+              ]
+            ]
+          ]
+
+          print angle-between
+        ]
+      ]
+
+      forward df
+
+    ]
+  ]
+end
+
+to forward-turtles-parallel-biased-right
+  ask turtles [
+    let here patch-here
+    let proximal-patches ((walls in-cone (bact-rad + .708) (180)) with [not (self = here)]) ;; - 2 * dtheta
+    let walls-infront (min-one-of proximal-patches [distance myself])
+    ;;increase df by sqrt(.5) to adjust since the thing measures from the center of the patch?
+    ;;print walls-infront
+    ifelse walls-infront = nobody [
+      ;;#### BEHAVIOUR if the agent has no wall in front of it ####
+      forward df
+    ] [
+      let a ([angle] of walls-infront)
+
+      ifelse heading = ( a + 180 ) mod 360 [
+        ;;#### BEHAVIOUR if the agent hits the wall head-on ####
+        set heading ( a - 90 ) ;;turn right
+      ] [
+        let incident-x (sin (heading))
+        let incident-y (cos (heading))
+        let norm-x (sin a)
+        let norm-y (cos a)
+
+        let dotprod ( incident-x * norm-x + incident-y * norm-y )
+
+        ifelse dotprod > 0 [
+          ;;#### if the agent heading is in the same direction of the wall angle, need to see if within critical angle ####
+          ;;print "nearest wall is not angled towards us"
+          let crossprod ( norm-x * incident-y - norm-y * incident-x )
+          let angle-between ( asin crossprod )
+          print angle-between
+
+          ifelse (abs angle-between) > 90 - critical-wall-angle  [
+            ;;#### BEHAVIOUR if within critical wall angle ####
+            ifelse crossprod < 0 [
+              ;;print "initially facing left relative to wall"
+              set heading ( a + 90 )
+            ] [
+              ;;print "initially facing right relative to wall"
+              ;;do nothing
+            ]
+
+          ][
+            ;;#### BEHAVIOUR if outside critical wall angle ####
+            ;; angle between wall and agent too steep to influence heading: do nothing
+          ]
+        ] [
+
+          ;;agent hitting against wall
+          let crossprod ( norm-x * incident-y - norm-y * incident-x )
+          let angle-between ( asin crossprod )
+          let abs-angle (abs angle-between)
+          ifelse crossprod < 0 [
+            ;;#### BEHAVIOUR if agent hits wall facing left ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing left) ####
+              set heading ( a - 90 )
+            ][
+              ifelse abs-angle < leftmost-angle [
+                ;;#### BEHAVIOUR if agent is left-facing within the left-most experimental angle ####
+                set heading ( a - 90 )
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the left-most experimental angle ####
+                set heading ( a + 90 ) ;;if too extreme, allow it to still turn left
+              ]
+            ]
+
+          ] [
+            ;;#### BEHAVIOUR if agent hits wall facing right ####
+            ifelse abs-angle < 5 [
+              ;;#### BEHAVIOUR if agent is in straight on collision within 5 degrees (initially facing right) ####
+              set heading ( a - 90 )
+            ][
+              ifelse abs-angle < rightmost-angle [
+                ;;#### BEHAVIOUR if agent is right-facing within the right-most experimental angle ####
+                set heading ( a - 90 )
+              ][
+                ;;#### BEHAVIOUR if agent is outside of the right-most experimental angle ####
+                set heading ( a - 90 )
+              ]
+            ]
+          ]
+
+          print angle-between
+        ]
+      ]
+
+      forward df
+
+    ]
+  ]
+end
 
 to forward-turtles-pingpong
   ask turtles [
@@ -897,7 +1101,7 @@ num-bacteria
 num-bacteria
 1
 100
-20.0
+1.0
 1
 1
 NIL
@@ -910,7 +1114,7 @@ CHOOSER
 169
 motility
 motility
-"E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom" "parallel2"
+"E.coli" "P.putida" "V.natriegens" "V.fischeri" "M.marinus" "parallel" "pingpong" "custom" "parallel2" "biased left"
 0
 
 INPUTBOX
@@ -981,7 +1185,7 @@ SWITCH
 355
 trace-path?
 trace-path?
-1
+0
 1
 -1000
 
@@ -1185,7 +1389,7 @@ SWITCH
 91
 diffusion?
 diffusion?
-0
+1
 1
 -1000
 
@@ -1218,7 +1422,7 @@ SWITCH
 545
 biased-left
 biased-left
-1
+0
 1
 -1000
 
@@ -1462,7 +1666,7 @@ SWITCH
 735
 split-start
 split-start
-0
+1
 1
 -1000
 
@@ -1502,6 +1706,16 @@ percent-start-1
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+540
+505
+690
+561
+note: having both biased left and biased right leads to biased left behaviour, they do not cancel out.
+11
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
