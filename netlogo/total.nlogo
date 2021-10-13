@@ -304,18 +304,51 @@ to calc-heatmap
 end
 
 to setup-turtles
-  create-turtles num-bacteria [
-    setxy start-x start-y
-    set size turtle-size
-    set shape "bacteria"
-    set color grey
-    if trace-path? and not heat-map? [
-      pen-down
-      set pen-size trace-thickness;;2
+  ifelse split-start [
+    create-turtles num-bacteria * (percent-start-1 / 100) [
+      setxy start-x start-y
+      set size turtle-size
+      set shape "bacteria"
+      set color grey
+      if trace-path? and not heat-map? [
+        pen-down
+        set pen-size trace-thickness;;2
+      ]
+      if uniform-head? [
+        set heading init-head
+      ]
     ]
-    if uniform-head? [
-      set heading init-head
+
+    create-turtles num-bacteria * (1 - (percent-start-1 / 100)) [
+      setxy start-x2 start-y2
+      set size turtle-size
+      set shape "bacteria"
+      set color grey
+      if trace-path? and not heat-map? [
+        pen-down
+        set pen-size trace-thickness;;2
+      ]
+      if uniform-head? [
+        set heading init-head
+      ]
     ]
+
+  ]
+  [
+    create-turtles num-bacteria [
+      setxy start-x start-y
+      set size turtle-size
+      set shape "bacteria"
+      set color grey
+      if trace-path? and not heat-map? [
+        pen-down
+        set pen-size trace-thickness;;2
+      ]
+      if uniform-head? [
+        set heading init-head
+      ]
+    ]
+
   ]
 end
 
@@ -814,11 +847,11 @@ end
 GRAPHICS-WINDOW
 1098
 53
-2721
-937
+1508
+464
 -1
 -1
-1.0
+2.0
 1
 10
 1
@@ -828,10 +861,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--807
-807
--437
-437
+-100
+100
+-100
+100
 1
 1
 1
@@ -886,7 +919,7 @@ INPUTBOX
 254
 261
 start-x
--92.0
+-81.0
 1
 0
 Number
@@ -897,7 +930,7 @@ INPUTBOX
 329
 261
 start-y
--32.0
+-52.0
 1
 0
 Number
@@ -1212,7 +1245,7 @@ CHOOSER
 environment
 environment
 "uniform maze" "non-uniform maze" "plaza" "custom file"
-3
+1
 
 INPUTBOX
 23
@@ -1386,7 +1419,7 @@ SWITCH
 641
 record-movie?
 record-movie?
-0
+1
 1
 -1000
 
@@ -1421,6 +1454,54 @@ out
 1
 0
 String
+
+SWITCH
+189
+702
+298
+735
+split-start
+split-start
+0
+1
+-1000
+
+INPUTBOX
+305
+702
+355
+762
+start-x2
+-61.0
+1
+0
+Number
+
+INPUTBOX
+359
+702
+409
+762
+start-y2
+-88.0
+1
+0
+Number
+
+SLIDER
+412
+702
+584
+735
+percent-start-1
+percent-start-1
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
