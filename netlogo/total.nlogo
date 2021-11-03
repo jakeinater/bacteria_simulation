@@ -1190,10 +1190,10 @@ trace-path?
 -1000
 
 SWITCH
-185
-367
-349
-400
+765
+420
+929
+453
 heat-map?
 heat-map?
 1
@@ -1201,10 +1201,10 @@ heat-map?
 -1000
 
 INPUTBOX
-284
-407
-422
-491
+861
+460
+956
+526
 heatmap-seconds
 100.0
 1
@@ -1223,10 +1223,10 @@ velocity
 Number
 
 INPUTBOX
-185
-407
-278
-473
+765
+460
+858
+526
 heatmap-buffer
 1.0
 1
@@ -1361,7 +1361,7 @@ turtle-size
 turtle-size
 1
 50
-10.0
+25.0
 1
 1
 NIL
@@ -1376,7 +1376,7 @@ trace-thickness
 trace-thickness
 0
 10
-1.0
+3.0
 1
 1
 NIL
@@ -1389,7 +1389,7 @@ SWITCH
 91
 diffusion?
 diffusion?
-1
+0
 1
 -1000
 
@@ -1422,7 +1422,7 @@ SWITCH
 545
 biased-left
 biased-left
-0
+1
 1
 -1000
 
